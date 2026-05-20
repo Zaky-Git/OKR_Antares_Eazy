@@ -1,38 +1,21 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8.0
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${DB_NAME:-okr_antares_eazy}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    ports:
-      - "3307:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build: ./backend
     restart: always
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       APP_PORT: 8080
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      DB_HOST: ${DB_HOST:-detectme-api-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-}
       DB_NAME: ${DB_NAME:-okr_antares_eazy}
       JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
     ports:
       - "8181:8080"
+    networks:
+      - detectme-net
 
   frontend:
     build:
@@ -44,6 +27,10 @@ services:
       - backend
     ports:
       - "8182:80"
+    networks:
+      - detectme-net
 
-volumes:
-  mysql_data:
+networks:
+  detectme-net:
+    external: true
+    name: backend_detectme_detectme-api-network
