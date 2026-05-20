@@ -1,6 +1,10 @@
 package initiative
 
-import "gorm.io/gorm"
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
 
 type Repository struct {
 	db *gorm.DB
@@ -131,4 +135,20 @@ func (r *Repository) GetDB() *gorm.DB {
 
 func (r *Repository) CreateUpdate(u *InitiativeUpdate) error {
 	return r.db.Create(u).Error
+}
+
+func (r *Repository) AssignToSprint(initiativeID uint, sprintID uint) error {
+	var i Initiative
+	if err := r.db.First(&i, initiativeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("initiative not found")
+		}
+		return err
+	}
+
+	if i.SprintID != nil {
+		return errors.New("initiative is already assigned to a sprint")
+	}
+
+	return r.db.Model(&Initiative{}).Where("id = ?", initiativeID).Update("sprint_id", sprintID).Error
 }

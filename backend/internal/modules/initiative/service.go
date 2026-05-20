@@ -421,6 +421,27 @@ func (s *Service) GetMyInitiativesInActiveSprint(periodID, userID uint) ([]Initi
 	return ToInitiativeResponses(initiatives), sprintID, nil
 }
 
+func (s *Service) AssignToSprint(initiativeID uint, sprintID uint, userID uint) error {
+	// Validate sprint is not COMPLETED
+	var sprint struct {
+		ID     uint
+		Status string
+	}
+	if err := s.repo.GetDB().Table("sprints").Where("id = ? AND deleted_at IS NULL", sprintID).First(&sprint).Error; err != nil {
+		return errors.New("sprint not found")
+	}
+	if sprint.Status == "COMPLETED" {
+		return errors.New("cannot assign initiatives to a completed sprint")
+	}
+
+	// Call repository (validates initiative exists and sprint_id is NULL)
+	if err := s.repo.AssignToSprint(initiativeID, sprintID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *Service) Delete(id uint, userID uint) error {
 	initiative, err := s.repo.FindByID(id)
 	if err != nil {

@@ -153,6 +153,90 @@ func (h *Handler) Complete(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Sprint completed successfully", sprint)
 }
 
+func (h *Handler) GetSprintInitiatives(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid sprint ID", nil)
+		return
+	}
+
+	initiatives, err := h.service.GetSprintInitiatives(uint(id))
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "Failed to fetch sprint initiatives", nil)
+		return
+	}
+
+	// Return flat array; frontend handles grouping
+	response.Success(c, http.StatusOK, "Success", initiatives)
+}
+
+func (h *Handler) GetSprintSummary(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid sprint ID", nil)
+		return
+	}
+
+	summary, err := h.service.GetSprintSummary(uint(id))
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "Failed to fetch sprint summary", nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Success", summary)
+}
+
+func (h *Handler) GetSprintBacklog(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid sprint ID", nil)
+		return
+	}
+
+	backlog, err := h.service.GetSprintBacklog(uint(id))
+	if err != nil {
+		if err.Error() == "sprint not found" {
+			response.Error(c, http.StatusNotFound, err.Error(), nil)
+			return
+		}
+		response.Error(c, http.StatusInternalServerError, "Failed to fetch backlog", nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Success", backlog)
+}
+
+func (h *Handler) CarryOver(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid sprint ID", nil)
+		return
+	}
+
+	var req CarryOverRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "initiative_ids is required", err.Error())
+		return
+	}
+
+	userID := c.GetUint("user_id")
+	result, err := h.service.CarryOverInitiatives(uint(id), req.InitiativeIDs, userID)
+	if err != nil {
+		if err.Error() == "sprint not found" {
+			response.Error(c, http.StatusNotFound, err.Error(), nil)
+			return
+		}
+		if err.Error() == "no target sprint available for carry-over in this quarter" {
+			response.Error(c, http.StatusUnprocessableEntity, err.Error(), nil)
+			return
+		}
+		response.Error(c, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Initiatives carried over successfully", result)
+}
+
 func (h *Handler) Delete(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

@@ -2,18 +2,21 @@ package sprint
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/antares-eazy/okr-backend/internal/modules/activitylog"
 	"github.com/antares-eazy/okr-backend/internal/modules/period"
 )
 
 type Service struct {
 	repo       *Repository
 	periodRepo *period.Repository
+	actLogger  *activitylog.Service
 }
 
-func NewService(repo *Repository, periodRepo *period.Repository) *Service {
-	return &Service{repo: repo, periodRepo: periodRepo}
+func NewService(repo *Repository, periodRepo *period.Repository, actLogger *activitylog.Service) *Service {
+	return &Service{repo: repo, periodRepo: periodRepo, actLogger: actLogger}
 }
 
 func (s *Service) Create(req CreateRequest, userID uint) (*SprintResponse, error) {
@@ -185,4 +188,124 @@ func (s *Service) Delete(id uint) error {
 		return errors.New("sprint not found")
 	}
 	return s.repo.SoftDelete(id)
+}
+
+// CarryOverInitiatives moves selected initiatives to the next PLANNING sprint in the same period
+func (s *Service) CarryOverInitiatives(sprintID uint, initiativeIDs []uint, userID uint) (*CarryOverResponse, error) {
+	// 1. Find the current sprint to get its period_id
+	sprint, err := s.repo.FindByID(sprintID)
+	if err != nil {
+		return nil, errors.New("sprint not found")
+	}
+
+	// 2. Find next PLANNING sprint in the same period
+	targetSprint, err := s.repo.FindNextPlanningSprintInPeriod(sprint.PeriodID, sprintID)
+	if err != nil {
+		return nil, errors.New("no target sprint available for carry-over in this quarter")
+	}
+
+	// 3. Update each initiative's sprint_id and log activity
+	carriedCount := 0
+	for _, initID := range initiativeIDs {
+		if err := s.repo.UpdateInitiativeSprintID(initID, targetSprint.ID); err != nil {
+			continue
+		}
+		carriedCount++
+
+		// Log activity for each carried initiative
+		title, _ := s.repo.GetInitiativeTitle(initID)
+		s.actLogger.Log(
+			userID,
+			activitylog.ActionAssign,
+			activitylog.EntityInitiative,
+			initID,
+			title,
+			activitylog.WithDescription(fmt.Sprintf("carry-over initiative \"%s\" to sprint \"%s\"", title, targetSprint.Name)),
+			activitylog.WithInitiativeID(initID),
+		)
+	}
+
+	return &CarryOverResponse{
+		CarriedCount:     carriedCount,
+		TargetSprintID:   targetSprint.ID,
+		TargetSprintName: targetSprint.Name,
+	}, nil
+}
+
+func (s *Service) GetSprintInitiatives(sprintID uint) ([]SprintInitiativeResponse, error) {
+	rows, err := s.repo.GetSprintInitiatives(sprintID)
+	if err != nil {
+		return nil, err
+	}
+
+	responses := make([]SprintInitiativeResponse, len(rows))
+	for i, row := range rows {
+		responses[i] = SprintInitiativeResponse{
+			ID:             row.ID,
+			KeyResultID:    row.KeyResultID,
+			SprintID:       row.SprintID,
+			ParentID:       row.ParentID,
+			Title:          row.Title,
+			Description:    row.Description,
+			AssigneeID:     row.AssigneeID,
+			AssigneeName:   row.AssigneeName,
+			Progress:       row.Progress,
+			Status:         row.Status,
+			DueDate:        row.DueDate,
+			ObjectiveTitle: row.ObjectiveTitle,
+			KeyResultTitle: row.KeyResultTitle,
+			CreatedBy:      row.CreatedBy,
+		}
+	}
+	return responses, nil
+}
+
+func (s *Service) GetSprintSummary(sprintID uint) (*SprintSummaryResponse, error) {
+	row, err := s.repo.GetSprintSummary(sprintID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SprintSummaryResponse{
+		TotalInitiatives: row.TotalInitiatives,
+		TodoCount:        row.TodoCount,
+		InProgressCount:  row.InProgressCount,
+		BlockedCount:     row.BlockedCount,
+		DoneCount:        row.DoneCount,
+		CancelledCount:   row.CancelledCount,
+		SprintProgress:   row.SprintProgress,
+	}, nil
+}
+
+func (s *Service) GetSprintBacklog(sprintID uint) ([]SprintInitiativeResponse, error) {
+	sprint, err := s.repo.FindByID(sprintID)
+	if err != nil {
+		return nil, errors.New("sprint not found")
+	}
+
+	rows, err := s.repo.GetBacklogInitiatives(sprint.PeriodID)
+	if err != nil {
+		return nil, err
+	}
+
+	responses := make([]SprintInitiativeResponse, len(rows))
+	for i, row := range rows {
+		responses[i] = SprintInitiativeResponse{
+			ID:             row.ID,
+			KeyResultID:    row.KeyResultID,
+			SprintID:       row.SprintID,
+			ParentID:       row.ParentID,
+			Title:          row.Title,
+			Description:    row.Description,
+			AssigneeID:     row.AssigneeID,
+			AssigneeName:   row.AssigneeName,
+			Progress:       row.Progress,
+			Status:         row.Status,
+			DueDate:        row.DueDate,
+			ObjectiveTitle: row.ObjectiveTitle,
+			KeyResultTitle: row.KeyResultTitle,
+			CreatedBy:      row.CreatedBy,
+		}
+	}
+	return responses, nil
 }

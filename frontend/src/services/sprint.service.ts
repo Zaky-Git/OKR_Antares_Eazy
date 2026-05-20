@@ -1,5 +1,5 @@
 import api from './api';
-import { ApiResponse, Sprint } from '../types';
+import { ApiResponse, Sprint, SprintInitiative, SprintSummary, CarryOverResponse } from '../types';
 
 export const sprintService = {
   getByPeriod: (periodId: number) =>
@@ -22,4 +22,19 @@ export const sprintService = {
 
   delete: (id: number) =>
     api.delete<ApiResponse<null>>(`/sprints/${id}`),
+
+  getSprintInitiatives: (sprintId: number) =>
+    api.get<ApiResponse<SprintInitiative[]>>(`/sprints/${sprintId}/initiatives`),
+
+  getSprintSummary: (sprintId: number) =>
+    api.get<ApiResponse<SprintSummary>>(`/sprints/${sprintId}/summary`),
+
+  getSprintBacklog: (sprintId: number) =>
+    api.get<ApiResponse<SprintInitiative[]>>(`/sprints/${sprintId}/backlog`),
+
+  carryOverInitiatives: (sprintId: number, data: { initiative_ids: number[] }) =>
+    api.post<ApiResponse<CarryOverResponse>>(`/sprints/${sprintId}/carry-over`, data),
+
+  assignInitiativeToSprint: (initiativeId: number, data: { sprint_id: number }) =>
+    api.patch<ApiResponse<null>>(`/initiatives/${initiativeId}/assign-sprint`, data),
 };

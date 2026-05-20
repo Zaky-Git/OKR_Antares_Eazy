@@ -35,13 +35,13 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 	authService := auth.NewService(authRepo, cfg)
 	periodService := period.NewService(periodRepo)
-	sprintService := sprint.NewService(sprintRepo, periodRepo)
+	activityService := activitylog.NewService(activityRepo, hub)
+	sprintService := sprint.NewService(sprintRepo, periodRepo, activityService)
 	objectiveService := objective.NewService(objectiveRepo)
 	krService := keyresult.NewService(krRepo)
 	initiativeService := initiative.NewService(initiativeRepo, krRepo, objectiveRepo)
 	notificationService := notification.NewService(notificationRepo, initiativeRepo)
 	dashboardService := dashboard.NewService(db)
-	activityService := activitylog.NewService(activityRepo, hub)
 
 
 	authHandler := auth.NewHandler(authService)
@@ -87,6 +87,10 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		protected.PATCH("/sprints/:id", sprintHandler.Update)
 		protected.PATCH("/sprints/:id/activate", sprintHandler.Activate)
 		protected.PATCH("/sprints/:id/complete", sprintHandler.Complete)
+		protected.GET("/sprints/:id/initiatives", sprintHandler.GetSprintInitiatives)
+		protected.GET("/sprints/:id/summary", sprintHandler.GetSprintSummary)
+		protected.GET("/sprints/:id/backlog", sprintHandler.GetSprintBacklog)
+		protected.POST("/sprints/:id/carry-over", sprintHandler.CarryOver)
 		protected.DELETE("/sprints/:id", sprintHandler.Delete)
 
 
@@ -110,6 +114,7 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		protected.GET("/key-results/:id/initiative-tree", initiativeHandler.GetTree)
 		protected.PATCH("/initiatives/:id", initiativeHandler.Update)
 		protected.PATCH("/initiatives/:id/progress", initiativeHandler.UpdateProgress)
+		protected.PATCH("/initiatives/:id/assign-sprint", initiativeHandler.AssignSprint)
 		protected.DELETE("/initiatives/:id", initiativeHandler.Delete)
 
 

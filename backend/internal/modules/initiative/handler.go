@@ -204,6 +204,45 @@ func (h *Handler) GetMyActiveSprintInitiatives(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Success", result)
 }
 
+func (h *Handler) AssignSprint(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid initiative ID", nil)
+		return
+	}
+
+	var req struct {
+		SprintID uint `json:"sprint_id" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return
+	}
+
+	userID := c.GetUint("user_id")
+	if err := h.service.AssignToSprint(uint(id), req.SprintID, userID); err != nil {
+		switch err.Error() {
+		case "initiative not found":
+			response.Error(c, http.StatusNotFound, err.Error(), nil)
+		case "sprint not found":
+			response.Error(c, http.StatusNotFound, err.Error(), nil)
+		case "initiative is already assigned to a sprint":
+			response.Error(c, http.StatusUnprocessableEntity, err.Error(), nil)
+		case "cannot assign initiatives to a completed sprint":
+			response.Error(c, http.StatusUnprocessableEntity, err.Error(), nil)
+		default:
+			response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		}
+		return
+	}
+
+	h.actLogger.Log(userID, activitylog.ActionAssign, activitylog.EntityInitiative, uint(id), "",
+		activitylog.WithInitiativeID(uint(id)),
+		activitylog.WithDescription(fmt.Sprintf("assigned initiative to sprint %d", req.SprintID)))
+
+	response.Success(c, http.StatusOK, "Initiative assigned to sprint successfully", nil)
+}
+
 func (h *Handler) Delete(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

@@ -64,9 +64,15 @@ export function useWebSocket() {
               queryClient.invalidateQueries({ queryKey: ['initiative-tree'] });
               queryClient.invalidateQueries({ queryKey: ['key-results'] });
               queryClient.invalidateQueries({ queryKey: ['objectives'] });
+              queryClient.invalidateQueries({ queryKey: ['sprint-initiatives'] });
+              queryClient.invalidateQueries({ queryKey: ['sprint-summary'] });
+              queryClient.invalidateQueries({ queryKey: ['sprint-backlog'] });
               break;
             case 'SPRINT':
               queryClient.invalidateQueries({ queryKey: ['sprints'] });
+              queryClient.invalidateQueries({ queryKey: ['sprint-initiatives'] });
+              queryClient.invalidateQueries({ queryKey: ['sprint-summary'] });
+              queryClient.invalidateQueries({ queryKey: ['sprint-backlog'] });
               break;
           }
         }

@@ -132,6 +132,39 @@ export interface QuarterSummary {
   done: number;
 }
 
+export interface SprintInitiative {
+  id: number;
+  key_result_id: number;
+  sprint_id: number | null;
+  parent_id: number | null;
+  title: string;
+  description: string | null;
+  assignee_id: number | null;
+  assignee_name: string | null;
+  progress: number;
+  status: string;
+  due_date: string | null;
+  objective_title: string;
+  key_result_title: string;
+  created_by: number;
+}
+
+export interface SprintSummary {
+  total_initiatives: number;
+  todo_count: number;
+  in_progress_count: number;
+  blocked_count: number;
+  done_count: number;
+  cancelled_count: number;
+  sprint_progress: number;
+}
+
+export interface CarryOverResponse {
+  carried_count: number;
+  target_sprint_id: number;
+  target_sprint_name: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

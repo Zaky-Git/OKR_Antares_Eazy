@@ -37,6 +37,52 @@ type SprintResponse struct {
 	UpdatedAt  time.Time `json:"updated_at"`
 }
 
+// SprintInitiativeResponse represents an initiative with parent context for sprint board display
+type SprintInitiativeResponse struct {
+	ID             uint    `json:"id"`
+	KeyResultID    uint    `json:"key_result_id"`
+	SprintID       *uint   `json:"sprint_id"`
+	ParentID       *uint   `json:"parent_id"`
+	Title          string  `json:"title"`
+	Description    *string `json:"description"`
+	AssigneeID     *uint   `json:"assignee_id"`
+	AssigneeName   *string `json:"assignee_name"`
+	Progress       float64 `json:"progress"`
+	Status         string  `json:"status"`
+	DueDate        *string `json:"due_date"`
+	ObjectiveTitle string  `json:"objective_title"`
+	KeyResultTitle string  `json:"key_result_title"`
+	CreatedBy      uint    `json:"created_by"`
+}
+
+// SprintSummaryResponse represents aggregate sprint progress metrics
+type SprintSummaryResponse struct {
+	TotalInitiatives int     `json:"total_initiatives"`
+	TodoCount        int     `json:"todo_count"`
+	InProgressCount  int     `json:"in_progress_count"`
+	BlockedCount     int     `json:"blocked_count"`
+	DoneCount        int     `json:"done_count"`
+	CancelledCount   int     `json:"cancelled_count"`
+	SprintProgress   float64 `json:"sprint_progress"`
+}
+
+// CarryOverRequest represents the request to carry over initiatives to the next sprint
+type CarryOverRequest struct {
+	InitiativeIDs []uint `json:"initiative_ids" binding:"required"`
+}
+
+// CarryOverResponse represents the result of a carry-over operation
+type CarryOverResponse struct {
+	CarriedCount     int    `json:"carried_count"`
+	TargetSprintID   uint   `json:"target_sprint_id"`
+	TargetSprintName string `json:"target_sprint_name"`
+}
+
+// AssignSprintRequest represents a request to assign an initiative to a sprint
+type AssignSprintRequest struct {
+	SprintID uint `json:"sprint_id" binding:"required"`
+}
+
 func ToSprintResponse(s *Sprint) SprintResponse {
 	return SprintResponse{
 		ID:         s.ID,
