@@ -1,0 +1,31 @@
+@function hex-to-rgba($hex, $alpha: 1) {
+  $hex: str-replace($hex, "#", "");
+  @if (str-length($hex) == 3) {
+    $r: str-slice($hex, 1, 1) + str-slice($hex, 1, 1);
+    $g: str-slice($hex, 2, 2) + str-slice($hex, 2, 2);
+    $b: str-slice($hex, 3, 3) + str-slice($hex, 3, 3);
+  } @else if (str-length($hex) == 6) {
+    $r: str-slice($hex, 1, 2);
+    $g: str-slice($hex, 3, 4);
+    $b: str-slice($hex, 5, 6);
+  } @else {
+    @error "Invalid hex color: #{$hex}";
+  }
+  $red: hex-to-dec($r);
+  $green: hex-to-dec($g);
+  $blue: hex-to-dec($b);
+  @return rgba($red, $green, $blue, $alpha);
+}
+
+@function hex-to-dec($hex) {
+  @return str-to-number('0x' + $hex);
+}
+
+// Helper to replace string (Sass doesn't have native replace, so use this if you have it, or use a mixin/library)
+@function str-replace($string, $search, $replace: "") {
+  $index: str-index($string, $search);
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+  @return $string;
+}

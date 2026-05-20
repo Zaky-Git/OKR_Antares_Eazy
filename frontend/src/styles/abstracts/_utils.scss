@@ -1,0 +1,15 @@
+@use "sass:string";
+@use "sass:meta";
+
+@function to-number($value) {
+  @if meta.type-of($value) == "number" {
+    @return $value;
+  }
+
+  @if meta.type-of($value) == "string" {
+    $stripped: string.slice($value, 1, string.index($value + " ", " ") - 1);
+    @return $stripped * 1;
+  }
+
+  @error "Unsupported type: #{$value}";
+}

@@ -1,0 +1,615 @@
+{
+  "info": {
+    "name": "OKR Antares Eazy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Zaky\",\n  \"email\": \"zaky@antares.id\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"zaky@antares.id\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Period",
+      "item": [
+        {
+          "name": "Ensure Current Year",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/periods/ensure-current-year",
+              "host": ["{{baseUrl}}"],
+              "path": ["periods", "ensure-current-year"]
+            }
+          }
+        },
+        {
+          "name": "Get All Periods",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/periods",
+              "host": ["{{baseUrl}}"],
+              "path": ["periods"]
+            }
+          }
+        },
+        {
+          "name": "Get Current Period",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/periods/current",
+              "host": ["{{baseUrl}}"],
+              "path": ["periods", "current"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sprint",
+      "item": [
+        {
+          "name": "Create Sprint",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period_id\": 2,\n  \"name\": \"Sprint 1\",\n  \"goal\": \"Complete core OKR features\",\n  \"start_date\": \"2026-04-01\",\n  \"end_date\": \"2026-04-14\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sprints",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints"]
+            }
+          }
+        },
+        {
+          "name": "Get Sprints by Period",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints?period_id=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints"],
+              "query": [
+                { "key": "period_id", "value": "2" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Sprint by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Sprint",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sprint 1 - Updated\",\n  \"goal\": \"Updated goal\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints", "1"]
+            }
+          }
+        },
+        {
+          "name": "Activate Sprint",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints", "1", "activate"]
+            }
+          }
+        },
+        {
+          "name": "Complete Sprint",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"review_note\": \"Completed auth module and period generation\",\n  \"retro_note\": \"Need better estimation for backend tasks\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints", "1", "complete"]
+            }
+          }
+        },
+        {
+          "name": "Delete Sprint",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["sprints", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Objective",
+      "item": [
+        {
+          "name": "Create Objective",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period_id\": 2,\n  \"title\": \"Increase system reliability\",\n  \"description\": \"Reduce downtime and improve uptime to 99.9%\",\n  \"confidence_level\": 7\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/objectives",
+              "host": ["{{baseUrl}}"],
+              "path": ["objectives"]
+            }
+          }
+        },
+        {
+          "name": "Get Objectives by Period",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives?period_id=2&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["objectives"],
+              "query": [
+                { "key": "period_id", "value": "2" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Objective by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["objectives", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Objective",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Increase system reliability\",\n  \"confidence_level\": 8,\n  \"status\": \"ON_TRACK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["objectives", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Objective",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["objectives", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Key Result",
+      "item": [
+        {
+          "name": "Create Key Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Reduce bug count from 50 to 10\",\n  \"description\": \"Fix critical and major bugs\",\n  \"target_value\": 50,\n  \"current_value\": 0,\n  \"metric_unit\": \"bugs fixed\",\n  \"confidence_level\": 6\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1/key-results",
+              "host": ["{{baseUrl}}"],
+              "path": ["objectives", "1", "key-results"]
+            }
+          }
+        },
+        {
+          "name": "Update Key Result",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Reduce bug count\",\n  \"current_value\": 15,\n  \"confidence_level\": 7\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["key-results", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Key Result",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["key-results", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Initiative",
+      "item": [
+        {
+          "name": "Create Initiative",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fix authentication bugs\",\n  \"description\": \"Resolve all auth-related issues\",\n  \"assignee_id\": 1,\n  \"sprint_id\": 1,\n  \"due_date\": \"2026-04-10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1/initiatives",
+              "host": ["{{baseUrl}}"],
+              "path": ["key-results", "1", "initiatives"]
+            }
+          }
+        },
+        {
+          "name": "Create Child Initiative",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fix login token expiry bug\",\n  \"description\": \"Token expires too quickly\",\n  \"assignee_id\": 1,\n  \"sprint_id\": 1,\n  \"due_date\": \"2026-04-08\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/1/children",
+              "host": ["{{baseUrl}}"],
+              "path": ["initiatives", "1", "children"]
+            }
+          }
+        },
+        {
+          "name": "Get Initiative Tree",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1/initiative-tree",
+              "host": ["{{baseUrl}}"],
+              "path": ["key-results", "1", "initiative-tree"]
+            }
+          }
+        },
+        {
+          "name": "Update Initiative",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Fix authentication bugs\",\n  \"status\": \"IN_PROGRESS\",\n  \"sprint_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["initiatives", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Initiative Progress (leaf only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"progress\": 50,\n  \"note\": \"Halfway done with token fix\",\n  \"blocker\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/2/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["initiatives", "2", "progress"]
+            }
+          }
+        },
+        {
+          "name": "Delete Initiative",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["initiatives", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notification",
+      "item": [
+        {
+          "name": "Check Due Initiatives",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/check-due-initiatives",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "check-due-initiatives"]
+            }
+          }
+        },
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/unread-count",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "unread-count"]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/1/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "1", "read"]
+            }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "read-all"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard (by period)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard?period_id=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard"],
+              "query": [
+                { "key": "period_id", "value": "2" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Annual Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/annual?year=2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "annual"],
+              "query": [
+                { "key": "year", "value": "2026" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

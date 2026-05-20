@@ -1,0 +1,48 @@
+@use "sass:math";
+@use "sass:string";
+@use "sass:color";
+
+// Fungsi konversi HEX ke RGBA dari string
+@function hex-to-rgba($hex, $alpha: 1) {
+  // Hapus '#' jika ada
+  @if string.index($hex, "#") == 1 {
+    $hex: string.slice($hex, 2);
+  }
+
+  // Format pendek 3 karakter (#f90)
+  @if string.length($hex) == 3 {
+    $r: string.slice($hex, 1, 1);
+    $g: string.slice($hex, 2, 2);
+    $b: string.slice($hex, 3, 3);
+    $hex: "#{$r}#{$r}#{$g}#{$g}#{$b}#{$b}";
+  } @else {
+    $hex: "#{$hex}";
+  }
+
+  // Ekstrak nilai R, G, B
+  $r-hex: string.slice($hex, 1, 2);
+  $g-hex: string.slice($hex, 3, 4);
+  $b-hex: string.slice($hex, 5, 6);
+
+  // Konversi HEX ke desimal
+  $r: math.div(str-to-dec($r-hex), 1);
+  $g: math.div(str-to-dec($g-hex), 1);
+  $b: math.div(str-to-dec($b-hex), 1);
+
+  @return rgba($r, $g, $b, $alpha);
+}
+
+// Helper untuk mengonversi HEX string ke angka
+@function str-to-dec($hex) {
+  $hex-lower: string.to-lower-case($hex);
+  $chars: "0123456789abcdef";
+  $first: string.index($chars, string.slice($hex-lower, 1, 1)) - 1;
+  $second: string.index($chars, string.slice($hex-lower, 2, 2)) - 1;
+
+  @return ($first * 16) + $second;
+}
+
+// Make a hex color darker by a percentage (0.0 - 1.0)
+@function hex-darker($hex, $amount: 0.15) {
+  @return color.scale($hex, $lightness: -$amount * 100%);
+}

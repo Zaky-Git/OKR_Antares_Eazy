@@ -1,0 +1,694 @@
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.895ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[1.102ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[33.685ms] [34;1m[rows:0][0m CREATE TABLE `users` (`id` bigint unsigned AUTO_INCREMENT,`name` varchar(100) NOT NULL,`email` varchar(150) NOT NULL,`password_hash` varchar(255) NOT NULL,`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL,`deleted_at` datetime(3) NULL,PRIMARY KEY (`id`),UNIQUE INDEX `idx_users_email` (`email`),INDEX `idx_users_deleted_at` (`deleted_at`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.533ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.879ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'periods' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[19.562ms] [34;1m[rows:0][0m CREATE TABLE `periods` (`id` bigint unsigned AUTO_INCREMENT,`year` bigint NOT NULL,`quarter` enum('Q1','Q2','Q3','Q4') NOT NULL,`start_date` date NOT NULL,`end_date` date NOT NULL,`is_current` boolean DEFAULT false,`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL,`deleted_at` datetime(3) NULL,PRIMARY KEY (`id`),INDEX `idx_periods_deleted_at` (`deleted_at`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.551ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[1.192ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'sprints' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[20.556ms] [34;1m[rows:0][0m CREATE TABLE `sprints` (`id` bigint unsigned AUTO_INCREMENT,`period_id` bigint unsigned NOT NULL,`name` varchar(100) NOT NULL,`goal` text,`start_date` date NOT NULL,`end_date` date NOT NULL,`status` varchar(30) DEFAULT 'PLANNING',`review_note` text,`retro_note` text,`created_by` bigint unsigned NOT NULL,`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL,`deleted_at` datetime(3) NULL,PRIMARY KEY (`id`),INDEX `idx_sprints_period_id` (`period_id`),INDEX `idx_sprints_deleted_at` (`deleted_at`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.785ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.550ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.542ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'objectives' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[24.979ms] [34;1m[rows:0][0m CREATE TABLE `objectives` (`id` bigint unsigned AUTO_INCREMENT,`period_id` bigint unsigned NOT NULL,`title` varchar(255) NOT NULL,`description` text,`progress` decimal(5,2) DEFAULT 0,`confidence_level` bigint DEFAULT 5,`status` varchar(30) DEFAULT 'PLANNING',`created_by` bigint unsigned NOT NULL,`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL,`deleted_at` datetime(3) NULL,PRIMARY KEY (`id`),INDEX `idx_objectives_deleted_at` (`deleted_at`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.549ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[1.004ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'key_results' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[25.127ms] [34;1m[rows:0][0m CREATE TABLE `key_results` (`id` bigint unsigned AUTO_INCREMENT,`objective_id` bigint unsigned NOT NULL,`title` varchar(255) NOT NULL,`description` text,`target_value` decimal(10,2) NOT NULL DEFAULT 100,`current_value` decimal(10,2) NOT NULL DEFAULT 0,`metric_unit` varchar(50),`progress` decimal(5,2) DEFAULT 0,`confidence_level` bigint DEFAULT 5,`status` varchar(30) DEFAULT 'PLANNING',`created_by` bigint unsigned NOT NULL,`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL,`deleted_at` datetime(3) NULL,PRIMARY KEY (`id`),INDEX `idx_key_results_deleted_at` (`deleted_at`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.542ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.554ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'initiatives' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[32.547ms] [34;1m[rows:0][0m CREATE TABLE `initiatives` (`id` bigint unsigned AUTO_INCREMENT,`key_result_id` bigint unsigned NOT NULL,`sprint_id` bigint unsigned,`parent_id` bigint unsigned,`title` varchar(255) NOT NULL,`description` text,`assignee_id` bigint unsigned,`progress` decimal(5,2) DEFAULT 0,`status` varchar(30) DEFAULT 'TODO',`due_date` date,`created_by` bigint unsigned NOT NULL,`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL,`deleted_at` datetime(3) NULL,PRIMARY KEY (`id`),INDEX `idx_initiatives_assignee_id` (`assignee_id`),INDEX `idx_initiatives_deleted_at` (`deleted_at`),INDEX `idx_initiatives_key_result_id` (`key_result_id`),INDEX `idx_initiatives_sprint_id` (`sprint_id`),INDEX `idx_initiatives_parent_id` (`parent_id`),CONSTRAINT `fk_initiatives_children` FOREIGN KEY (`parent_id`) REFERENCES `initiatives`(`id`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.537ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[1.085ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'initiative_updates' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[12.581ms] [34;1m[rows:0][0m CREATE TABLE `initiative_updates` (`id` bigint unsigned AUTO_INCREMENT,`initiative_id` bigint unsigned NOT NULL,`user_id` bigint unsigned NOT NULL,`progress_before` decimal(5,2),`progress_after` decimal(5,2),`note` text,`blocker` text,`created_at` datetime(3) NULL,PRIMARY KEY (`id`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.749ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.889ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.551ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'notifications' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[11.591ms] [34;1m[rows:0][0m CREATE TABLE `notifications` (`id` bigint unsigned AUTO_INCREMENT,`user_id` bigint unsigned NOT NULL,`type` varchar(50) NOT NULL,`title` varchar(255) NOT NULL,`message` text NOT NULL,`entity_type` varchar(50) NOT NULL,`entity_id` bigint unsigned NOT NULL,`is_read` boolean DEFAULT false,`created_at` datetime(3) NULL,`read_at` datetime(3) NULL,PRIMARY KEY (`id`))
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.558ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'okr_antares_eazy_test%' ORDER BY SCHEMA_NAME='okr_antares_eazy_test' DESC,SCHEMA_NAME limit 1
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[0.543ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'okr_antares_eazy_test' AND table_name = 'notification_logs' AND table_type = 'BASE TABLE'
+
+2026/05/19 13:23:02 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/database/migration.go:16
+[0m[33m[12.071ms] [34;1m[rows:0][0m CREATE TABLE `notification_logs` (`id` bigint unsigned AUTO_INCREMENT,`initiative_id` bigint unsigned NOT NULL,`user_id` bigint unsigned NOT NULL,`notification_type` varchar(50) NOT NULL,`reminder_key` varchar(50) NOT NULL,`created_at` datetime(3) NULL,PRIMARY KEY (`id`))
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/auth/register        --> github.com/antares-eazy/okr-backend/internal/modules/auth.(*Handler).Register-fm (4 handlers)
+[GIN-debug] POST   /api/auth/login           --> github.com/antares-eazy/okr-backend/internal/modules/auth.(*Handler).Login-fm (4 handlers)
+[GIN-debug] GET    /api/auth/me              --> github.com/antares-eazy/okr-backend/internal/modules/auth.(*Handler).Me-fm (5 handlers)
+[GIN-debug] GET    /api/periods              --> github.com/antares-eazy/okr-backend/internal/modules/period.(*Handler).GetAll-fm (5 handlers)
+[GIN-debug] GET    /api/periods/current      --> github.com/antares-eazy/okr-backend/internal/modules/period.(*Handler).GetCurrent-fm (5 handlers)
+[GIN-debug] POST   /api/periods/ensure-current-year --> github.com/antares-eazy/okr-backend/internal/modules/period.(*Handler).EnsureCurrentYear-fm (5 handlers)
+[GIN-debug] GET    /api/sprints              --> github.com/antares-eazy/okr-backend/internal/modules/sprint.(*Handler).GetByPeriod-fm (5 handlers)
+[GIN-debug] POST   /api/sprints              --> github.com/antares-eazy/okr-backend/internal/modules/sprint.(*Handler).Create-fm (5 handlers)
+[GIN-debug] GET    /api/sprints/:id          --> github.com/antares-eazy/okr-backend/internal/modules/sprint.(*Handler).GetByID-fm (5 handlers)
+[GIN-debug] PATCH  /api/sprints/:id          --> github.com/antares-eazy/okr-backend/internal/modules/sprint.(*Handler).Update-fm (5 handlers)
+[GIN-debug] PATCH  /api/sprints/:id/activate --> github.com/antares-eazy/okr-backend/internal/modules/sprint.(*Handler).Activate-fm (5 handlers)
+[GIN-debug] PATCH  /api/sprints/:id/complete --> github.com/antares-eazy/okr-backend/internal/modules/sprint.(*Handler).Complete-fm (5 handlers)
+[GIN-debug] DELETE /api/sprints/:id          --> github.com/antares-eazy/okr-backend/internal/modules/sprint.(*Handler).Delete-fm (5 handlers)
+[GIN-debug] GET    /api/objectives           --> github.com/antares-eazy/okr-backend/internal/modules/objective.(*Handler).GetByPeriod-fm (5 handlers)
+[GIN-debug] POST   /api/objectives           --> github.com/antares-eazy/okr-backend/internal/modules/objective.(*Handler).Create-fm (5 handlers)
+[GIN-debug] GET    /api/objectives/:id       --> github.com/antares-eazy/okr-backend/internal/modules/objective.(*Handler).GetByID-fm (5 handlers)
+[GIN-debug] PATCH  /api/objectives/:id       --> github.com/antares-eazy/okr-backend/internal/modules/objective.(*Handler).Update-fm (5 handlers)
+[GIN-debug] DELETE /api/objectives/:id       --> github.com/antares-eazy/okr-backend/internal/modules/objective.(*Handler).Delete-fm (5 handlers)
+[GIN-debug] POST   /api/objectives/:objective_id/key-results --> github.com/antares-eazy/okr-backend/internal/modules/keyresult.(*Handler).Create-fm (5 handlers)
+[GIN-debug] PATCH  /api/key-results/:id      --> github.com/antares-eazy/okr-backend/internal/modules/keyresult.(*Handler).Update-fm (5 handlers)
+[GIN-debug] DELETE /api/key-results/:id      --> github.com/antares-eazy/okr-backend/internal/modules/keyresult.(*Handler).Delete-fm (5 handlers)
+[GIN-debug] POST   /api/key-results/:key_result_id/initiatives --> github.com/antares-eazy/okr-backend/internal/modules/initiative.(*Handler).Create-fm (5 handlers)
+[GIN-debug] POST   /api/initiatives/:id/children --> github.com/antares-eazy/okr-backend/internal/modules/initiative.(*Handler).CreateChild-fm (5 handlers)
+[GIN-debug] GET    /api/key-results/:id/initiative-tree --> github.com/antares-eazy/okr-backend/internal/modules/initiative.(*Handler).GetTree-fm (5 handlers)
+[GIN-debug] PATCH  /api/initiatives/:id      --> github.com/antares-eazy/okr-backend/internal/modules/initiative.(*Handler).Update-fm (5 handlers)
+[GIN-debug] PATCH  /api/initiatives/:id/progress --> github.com/antares-eazy/okr-backend/internal/modules/initiative.(*Handler).UpdateProgress-fm (5 handlers)
+[GIN-debug] DELETE /api/initiatives/:id      --> github.com/antares-eazy/okr-backend/internal/modules/initiative.(*Handler).Delete-fm (5 handlers)
+[GIN-debug] GET    /api/notifications        --> github.com/antares-eazy/okr-backend/internal/modules/notification.(*Handler).GetNotifications-fm (5 handlers)
+[GIN-debug] GET    /api/notifications/unread-count --> github.com/antares-eazy/okr-backend/internal/modules/notification.(*Handler).GetUnreadCount-fm (5 handlers)
+[GIN-debug] PATCH  /api/notifications/:id/read --> github.com/antares-eazy/okr-backend/internal/modules/notification.(*Handler).MarkRead-fm (5 handlers)
+[GIN-debug] PATCH  /api/notifications/read-all --> github.com/antares-eazy/okr-backend/internal/modules/notification.(*Handler).MarkAllRead-fm (5 handlers)
+[GIN-debug] POST   /api/notifications/check-due-initiatives --> github.com/antares-eazy/okr-backend/internal/modules/notification.(*Handler).CheckDueInitiatives-fm (5 handlers)
+[GIN-debug] GET    /api/dashboard            --> github.com/antares-eazy/okr-backend/internal/modules/dashboard.(*Handler).GetDashboard-fm (5 handlers)
+[GIN-debug] GET    /api/dashboard/annual     --> github.com/antares-eazy/okr-backend/internal/modules/dashboard.(*Handler).GetAnnualDashboard-fm (5 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8081
+[GIN] 2026/05/19 - 13:23:03 | 401 |       506.3µs |             ::1 | GET      "/api/auth/me"
+[GIN] 2026/05/19 - 13:23:03 | 401 |            0s |             ::1 | GET      "/api/auth/me"
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:19 [35;1mrecord not found
+[0m[33m[1.519ms] [34;1m[rows:0][0m SELECT * FROM `users` WHERE email = 'testapi@antares.id' AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:14
+[0m[33m[8.051ms] [34;1m[rows:1][0m INSERT INTO `users` (`name`,`email`,`password_hash`,`created_at`,`updated_at`,`deleted_at`) VALUES ('TestUser','testapi@antares.id','$2a$10$4WyRTHz9WX7tsG0GG/OeY.qi6DOkjSAxiO/9vPJ25lEIoA2PCI8LS','2026-05-19 06:23:03.417','2026-05-19 06:23:03.417',NULL)
+[GIN] 2026/05/19 - 13:23:03 | 201 |     78.9564ms |             ::1 | POST     "/api/auth/register"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:19
+[0m[33m[0.670ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE email = 'testapi@antares.id' AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 400 |       669.6µs |             ::1 | POST     "/api/auth/register"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:19
+[0m[33m[0.679ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE email = 'testapi@antares.id' AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 200 |     70.5248ms |             ::1 | POST     "/api/auth/login"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:19
+[0m[33m[0.507ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE email = 'testapi@antares.id' AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 401 |     70.5506ms |             ::1 | POST     "/api/auth/login"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:28
+[0m[33m[0.510ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE `users`.`id` = 1 AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 200 |       510.4µs |             ::1 | GET      "/api/auth/me"
+[GIN] 2026/05/19 - 13:23:03 | 401 |            0s |             ::1 | GET      "/api/auth/me"
+[GIN] 2026/05/19 - 13:23:03 | 401 |            0s |             ::1 | GET      "/api/auth/me"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:30
+[0m[33m[2.250ms] [34;1m[rows:0][0m SELECT * FROM `periods` WHERE year = 2026 AND `periods`.`deleted_at` IS NULL ORDER BY quarter ASC
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:21 [35;1mrecord not found
+[0m[33m[0.544ms] [34;1m[rows:0][0m SELECT * FROM `periods` WHERE (year = 2026 AND quarter = 'Q1') AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:35
+[0m[33m[8.302ms] [34;1m[rows:1][0m INSERT INTO `periods` (`year`,`quarter`,`start_date`,`end_date`,`is_current`,`created_at`,`updated_at`,`deleted_at`) VALUES (2026,'Q1','2026-01-01 00:00:00','2026-03-31 00:00:00',false,'2026-05-19 06:23:03.633','2026-05-19 06:23:03.633',NULL)
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:21 [35;1mrecord not found
+[0m[33m[0.558ms] [34;1m[rows:0][0m SELECT * FROM `periods` WHERE (year = 2026 AND quarter = 'Q2') AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:35
+[0m[33m[2.147ms] [34;1m[rows:1][0m INSERT INTO `periods` (`year`,`quarter`,`start_date`,`end_date`,`is_current`,`created_at`,`updated_at`,`deleted_at`) VALUES (2026,'Q2','2026-04-01 00:00:00','2026-06-30 00:00:00',false,'2026-05-19 06:23:03.642','2026-05-19 06:23:03.642',NULL)
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:21 [35;1mrecord not found
+[0m[33m[0.694ms] [34;1m[rows:0][0m SELECT * FROM `periods` WHERE (year = 2026 AND quarter = 'Q3') AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:35
+[0m[33m[1.280ms] [34;1m[rows:1][0m INSERT INTO `periods` (`year`,`quarter`,`start_date`,`end_date`,`is_current`,`created_at`,`updated_at`,`deleted_at`) VALUES (2026,'Q3','2026-07-01 00:00:00','2026-09-30 00:00:00',false,'2026-05-19 06:23:03.646','2026-05-19 06:23:03.646',NULL)
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:21 [35;1mrecord not found
+[0m[33m[0.507ms] [34;1m[rows:0][0m SELECT * FROM `periods` WHERE (year = 2026 AND quarter = 'Q4') AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:35
+[0m[33m[2.330ms] [34;1m[rows:1][0m INSERT INTO `periods` (`year`,`quarter`,`start_date`,`end_date`,`is_current`,`created_at`,`updated_at`,`deleted_at`) VALUES (2026,'Q4','2026-10-01 00:00:00','2026-12-31 00:00:00',false,'2026-05-19 06:23:03.648','2026-05-19 06:23:03.648',NULL)
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:30
+[0m[33m[0.733ms] [34;1m[rows:4][0m SELECT * FROM `periods` WHERE year = 2026 AND `periods`.`deleted_at` IS NULL ORDER BY quarter ASC
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:43
+[0m[33m[0.758ms] [34;1m[rows:0][0m UPDATE `periods` SET `is_current`=false,`updated_at`='2026-05-19 06:23:03.651' WHERE is_current = true AND `periods`.`deleted_at` IS NULL
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:39
+[0m[33m[1.134ms] [34;1m[rows:1][0m UPDATE `periods` SET `is_current`=true,`updated_at`='2026-05-19 06:23:03.653' WHERE id = 2 AND `periods`.`deleted_at` IS NULL
+[GIN] 2026/05/19 - 13:23:03 | 200 |     25.0427ms |             ::1 | POST     "/api/periods/ensure-current-year"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:30
+[0m[33m[1.235ms] [34;1m[rows:4][0m SELECT * FROM `periods` WHERE year = 2026 AND `periods`.`deleted_at` IS NULL ORDER BY quarter ASC
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:43
+[0m[33m[2.153ms] [34;1m[rows:1][0m UPDATE `periods` SET `is_current`=false,`updated_at`='2026-05-19 06:23:03.672' WHERE is_current = true AND `periods`.`deleted_at` IS NULL
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:39
+[0m[33m[1.691ms] [34;1m[rows:1][0m UPDATE `periods` SET `is_current`=true,`updated_at`='2026-05-19 06:23:03.675' WHERE id = 2 AND `periods`.`deleted_at` IS NULL
+[GIN] 2026/05/19 - 13:23:03 | 200 |      6.9437ms |             ::1 | POST     "/api/periods/ensure-current-year"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:15
+[0m[33m[0.506ms] [34;1m[rows:4][0m SELECT * FROM `periods` WHERE `periods`.`deleted_at` IS NULL ORDER BY year DESC, quarter ASC
+[GIN] 2026/05/19 - 13:23:03 | 200 |       506.4µs |             ::1 | GET      "/api/periods"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:21
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT * FROM `periods` WHERE (year = 2026 AND quarter = 'Q2') AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 200 |       508.3µs |             ::1 | GET      "/api/periods/current"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:14
+[0m[33m[3.358ms] [34;1m[rows:1][0m INSERT INTO `objectives` (`period_id`,`title`,`description`,`progress`,`confidence_level`,`status`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (2,'Test Objective Alpha','Improve reliability',0,7,'PLANNING',1,'2026-05-19 06:23:03.728','2026-05-19 06:23:03.728',NULL)
+[GIN] 2026/05/19 - 13:23:03 | 201 |      3.3581ms |             ::1 | POST     "/api/objectives"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:14
+[0m[33m[2.061ms] [34;1m[rows:1][0m INSERT INTO `objectives` (`period_id`,`title`,`description`,`progress`,`confidence_level`,`status`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (2,'Test Objective Beta','Improve performance',0,6,'PLANNING',1,'2026-05-19 06:23:03.759','2026-05-19 06:23:03.759',NULL)
+[GIN] 2026/05/19 - 13:23:03 | 201 |      2.0605ms |             ::1 | POST     "/api/objectives"
+[GIN] 2026/05/19 - 13:23:03 | 400 |            0s |             ::1 | POST     "/api/objectives"
+[GIN] 2026/05/19 - 13:23:03 | 400 |            0s |             ::1 | POST     "/api/objectives"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:31
+[0m[33m[0.507ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:34
+[0m[33m[0.698ms] [34;1m[rows:2][0m SELECT * FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL ORDER BY created_at DESC LIMIT 10
+[GIN] 2026/05/19 - 13:23:03 | 200 |      1.7821ms |             ::1 | GET      "/api/objectives?period_id=2&page=1&limit=10"
+[GIN] 2026/05/19 - 13:23:03 | 400 |            0s |             ::1 | GET      "/api/objectives?page=1&limit=10"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 1 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 200 |         508µs |             ::1 | GET      "/api/objectives/1"
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19 [35;1mrecord not found
+[0m[33m[0.507ms] [34;1m[rows:0][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 99999 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 404 |       506.7µs |             ::1 | GET      "/api/objectives/99999"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19
+[0m[33m[0.505ms] [34;1m[rows:1][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 1 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:39
+[0m[33m[1.341ms] [34;1m[rows:1][0m UPDATE `objectives` SET `period_id`=2,`title`='Updated Objective Alpha',`description`='Improve reliability',`progress`=0,`confidence_level`=9,`status`='ON_TRACK',`created_by`=1,`created_at`='2026-05-19 06:23:03.728',`updated_at`='2026-05-19 06:23:03.846',`deleted_at`=NULL WHERE `objectives`.`deleted_at` IS NULL AND `id` = 1
+[GIN] 2026/05/19 - 13:23:03 | 200 |      3.2616ms |             ::1 | PATCH    "/api/objectives/1"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19
+[0m[33m[0.507ms] [34;1m[rows:1][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 1 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 400 |       507.5µs |             ::1 | PATCH    "/api/objectives/1"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19
+[0m[33m[0.739ms] [34;1m[rows:1][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 2 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:43
+[0m[33m[1.931ms] [34;1m[rows:1][0m UPDATE `objectives` SET `deleted_at`='2026-05-19 06:23:03.869' WHERE `objectives`.`id` = 2 AND `objectives`.`deleted_at` IS NULL
+[GIN] 2026/05/19 - 13:23:03 | 200 |       3.539ms |             ::1 | DELETE   "/api/objectives/2"
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19 [35;1mrecord not found
+[0m[33m[0.615ms] [34;1m[rows:0][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 2 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:03 | 404 |       614.7µs |             ::1 | GET      "/api/objectives/2"
+
+2026/05/19 13:23:03 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:19 [35;1mrecord not found
+[0m[33m[0.510ms] [34;1m[rows:0][0m SELECT * FROM `users` WHERE email = 'other@antares.id' AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:14
+[0m[33m[3.013ms] [34;1m[rows:1][0m INSERT INTO `users` (`name`,`email`,`password_hash`,`created_at`,`updated_at`,`deleted_at`) VALUES ('Other User','other@antares.id','$2a$10$sHxZm4/3Rp/ph.pv5.LrO.o4WjJdNP3lHtbhe300V2nzMnO/mQstS','2026-05-19 06:23:03.965','2026-05-19 06:23:03.965',NULL)
+[GIN] 2026/05/19 - 13:23:03 | 201 |      76.063ms |             ::1 | POST     "/api/auth/register"
+
+2026/05/19 13:23:03 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/auth/repository.go:19
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE email = 'other@antares.id' AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 200 |     84.0637ms |             ::1 | POST     "/api/auth/login"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19
+[0m[33m[0.505ms] [34;1m[rows:1][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 1 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 403 |       504.9µs |             ::1 | PATCH    "/api/objectives/1"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/objective/repository.go:19
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT * FROM `objectives` WHERE `objectives`.`id` = 1 AND `objectives`.`deleted_at` IS NULL ORDER BY `objectives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 403 |       507.9µs |             ::1 | DELETE   "/api/objectives/1"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:48
+[0m[33m[0.513ms] [34;1m[rows:1][0m SELECT * FROM `periods` WHERE `periods`.`id` = 2 AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:14
+[0m[33m[3.295ms] [34;1m[rows:1][0m INSERT INTO `sprints` (`period_id`,`name`,`goal`,`start_date`,`end_date`,`status`,`review_note`,`retro_note`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (2,'Sprint 1','Core features','2026-04-01 00:00:00','2026-04-14 00:00:00','PLANNING',NULL,NULL,1,'2026-05-19 06:23:04.093','2026-05-19 06:23:04.093',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |      4.5654ms |             ::1 | POST     "/api/sprints"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:48
+[0m[33m[0.652ms] [34;1m[rows:1][0m SELECT * FROM `periods` WHERE `periods`.`id` = 2 AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:14
+[0m[33m[2.315ms] [34;1m[rows:1][0m INSERT INTO `sprints` (`period_id`,`name`,`goal`,`start_date`,`end_date`,`status`,`review_note`,`retro_note`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (2,'Sprint 2',NULL,'2026-04-15 00:00:00','2026-04-28 00:00:00','PLANNING',NULL,NULL,1,'2026-05-19 06:23:04.111','2026-05-19 06:23:04.111',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |      3.7465ms |             ::1 | POST     "/api/sprints"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/period/repository.go:48
+[0m[33m[0.507ms] [34;1m[rows:1][0m SELECT * FROM `periods` WHERE `periods`.`id` = 2 AND `periods`.`deleted_at` IS NULL ORDER BY `periods`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 400 |       507.5µs |             ::1 | POST     "/api/sprints"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:28
+[0m[33m[0.507ms] [34;1m[rows:2][0m SELECT * FROM `sprints` WHERE period_id = 2 AND `sprints`.`deleted_at` IS NULL ORDER BY start_date ASC
+[GIN] 2026/05/19 - 13:23:04 | 200 |       507.2µs |             ::1 | GET      "/api/sprints?period_id=2"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:19
+[0m[33m[1.279ms] [34;1m[rows:1][0m SELECT * FROM `sprints` WHERE `sprints`.`id` = 1 AND `sprints`.`deleted_at` IS NULL ORDER BY `sprints`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 200 |      1.2786ms |             ::1 | GET      "/api/sprints/1"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:19
+[0m[33m[0.602ms] [34;1m[rows:1][0m SELECT * FROM `sprints` WHERE `sprints`.`id` = 1 AND `sprints`.`deleted_at` IS NULL ORDER BY `sprints`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:34 [35;1mrecord not found
+[0m[33m[0.980ms] [34;1m[rows:0][0m SELECT * FROM `sprints` WHERE (period_id = 2 AND status = 'ACTIVE') AND `sprints`.`deleted_at` IS NULL ORDER BY `sprints`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:42
+[0m[33m[4.122ms] [34;1m[rows:1][0m UPDATE `sprints` SET `period_id`=2,`name`='Sprint 1',`goal`='Core features',`start_date`='2026-04-01 00:00:00',`end_date`='2026-04-14 00:00:00',`status`='ACTIVE',`review_note`=NULL,`retro_note`=NULL,`created_by`=1,`created_at`='2026-05-19 06:23:04.093',`updated_at`='2026-05-19 06:23:04.171',`deleted_at`=NULL WHERE `sprints`.`deleted_at` IS NULL AND `id` = 1
+[GIN] 2026/05/19 - 13:23:04 | 200 |      6.5861ms |             ::1 | PATCH    "/api/sprints/1/activate"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:19
+[0m[33m[0.511ms] [34;1m[rows:1][0m SELECT * FROM `sprints` WHERE `sprints`.`id` = 2 AND `sprints`.`deleted_at` IS NULL ORDER BY `sprints`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:34
+[0m[33m[0.664ms] [34;1m[rows:1][0m SELECT * FROM `sprints` WHERE (period_id = 2 AND status = 'ACTIVE') AND `sprints`.`deleted_at` IS NULL ORDER BY `sprints`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 422 |      1.1749ms |             ::1 | PATCH    "/api/sprints/2/activate"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:19
+[0m[33m[0.506ms] [34;1m[rows:1][0m SELECT * FROM `sprints` WHERE `sprints`.`id` = 1 AND `sprints`.`deleted_at` IS NULL ORDER BY `sprints`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:42
+[0m[33m[2.398ms] [34;1m[rows:1][0m UPDATE `sprints` SET `period_id`=2,`name`='Sprint 1',`goal`='Core features',`start_date`='2026-04-01 00:00:00',`end_date`='2026-04-14 00:00:00',`status`='COMPLETED',`review_note`='All done',`retro_note`='Need better planning',`created_by`=1,`created_at`='2026-05-19 06:23:04.093',`updated_at`='2026-05-19 06:23:04.195',`deleted_at`=NULL WHERE `sprints`.`deleted_at` IS NULL AND `id` = 1
+[GIN] 2026/05/19 - 13:23:04 | 200 |      2.9043ms |             ::1 | PATCH    "/api/sprints/1/complete"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/sprint/repository.go:19
+[0m[33m[0.505ms] [34;1m[rows:1][0m SELECT * FROM `sprints` WHERE `sprints`.`id` = 1 AND `sprints`.`deleted_at` IS NULL ORDER BY `sprints`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 422 |         505µs |             ::1 | PATCH    "/api/sprints/1/complete"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/keyresult/repository.go:14
+[0m[33m[3.930ms] [34;1m[rows:1][0m INSERT INTO `key_results` (`objective_id`,`title`,`description`,`target_value`,`current_value`,`metric_unit`,`progress`,`confidence_level`,`status`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,'Reduce bugs from 50 to 10',NULL,50,0,'bugs fixed',0,6,'PLANNING',1,'2026-05-19 06:23:04.218','2026-05-19 06:23:04.218',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |      3.9303ms |             ::1 | POST     "/api/objectives/1/key-results"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/keyresult/repository.go:14
+[0m[33m[2.059ms] [34;1m[rows:1][0m INSERT INTO `key_results` (`objective_id`,`title`,`description`,`target_value`,`current_value`,`metric_unit`,`progress`,`confidence_level`,`status`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,'Increase coverage to 90%',NULL,90,60,'%',66.66666666666666,5,'PLANNING',1,'2026-05-19 06:23:04.235','2026-05-19 06:23:04.235',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |      2.0592ms |             ::1 | POST     "/api/objectives/1/key-results"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/keyresult/repository.go:19
+[0m[33m[0.509ms] [34;1m[rows:1][0m SELECT * FROM `key_results` WHERE `key_results`.`id` = 1 AND `key_results`.`deleted_at` IS NULL ORDER BY `key_results`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/keyresult/repository.go:33
+[0m[33m[1.811ms] [34;1m[rows:1][0m UPDATE `key_results` SET `objective_id`=1,`title`='Reduce bugs from 50 to 10',`description`=NULL,`target_value`=50,`current_value`=15,`metric_unit`='bugs fixed',`progress`=30,`confidence_level`=7,`status`='PLANNING',`created_by`=1,`created_at`='2026-05-19 06:23:04.218',`updated_at`='2026-05-19 06:23:04.252',`deleted_at`=NULL WHERE `key_results`.`deleted_at` IS NULL AND `id` = 1
+[GIN] 2026/05/19 - 13:23:04 | 200 |      2.9789ms |             ::1 | PATCH    "/api/key-results/1"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/keyresult/repository.go:19
+[0m[33m[0.509ms] [34;1m[rows:1][0m SELECT * FROM `key_results` WHERE `key_results`.`id` = 1 AND `key_results`.`deleted_at` IS NULL ORDER BY `key_results`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 403 |      1.0539ms |             ::1 | PATCH    "/api/key-results/1"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:14
+[0m[33m[4.155ms] [34;1m[rows:1][0m INSERT INTO `initiatives` (`key_result_id`,`sprint_id`,`parent_id`,`title`,`description`,`assignee_id`,`progress`,`status`,`due_date`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,2,NULL,'Fix auth bugs',NULL,1,0,'TODO','2026-04-20 00:00:00',1,'2026-05-19 06:23:04.276','2026-05-19 06:23:04.276',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |      4.5154ms |             ::1 | POST     "/api/key-results/1/initiatives"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 1 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:14
+[0m[33m[2.304ms] [34;1m[rows:1][0m INSERT INTO `initiatives` (`key_result_id`,`sprint_id`,`parent_id`,`title`,`description`,`assignee_id`,`progress`,`status`,`due_date`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,2,1,'Fix token expiry',NULL,1,0,'TODO','2026-04-18 00:00:00',1,'2026-05-19 06:23:04.295','2026-05-19 06:23:04.295',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |       3.476ms |             ::1 | POST     "/api/initiatives/1/children"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.764ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 1 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:14
+[0m[33m[1.653ms] [34;1m[rows:1][0m INSERT INTO `initiatives` (`key_result_id`,`sprint_id`,`parent_id`,`title`,`description`,`assignee_id`,`progress`,`status`,`due_date`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,NULL,1,'Fix password reset',NULL,1,0,'TODO','2026-04-19 00:00:00',1,'2026-05-19 06:23:04.313','2026-05-19 06:23:04.313',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |      3.8425ms |             ::1 | POST     "/api/initiatives/1/children"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:43
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `initiatives` WHERE `initiatives`.`parent_id` IN (2,3) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:43
+[0m[33m[1.235ms] [34;1m[rows:2][0m SELECT * FROM `initiatives` WHERE `initiatives`.`parent_id` = 1 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:43
+[0m[33m[2.040ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE (key_result_id = 1 AND parent_id IS NULL) AND `initiatives`.`deleted_at` IS NULL
+[GIN] 2026/05/19 - 13:23:04 | 200 |      2.0396ms |             ::1 | GET      "/api/key-results/1/initiative-tree"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.597ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 2 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:77
+[0m[33m[0.773ms] [34;1m[rows:1][0m SELECT count(*) FROM `initiatives` WHERE parent_id = 2 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:174
+[0m[33m[0.551ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `key_result_id`=1,`sprint_id`=2,`parent_id`=1,`title`='Fix token expiry',`description`=NULL,`assignee_id`=1,`progress`=80,`status`='TODO',`due_date`='2026-04-18 00:00:00',`created_by`=1,`created_at`='2026-05-19 06:23:04.295',`updated_at`='2026-05-19 06:23:04.346',`deleted_at`=NULL WHERE `initiatives`.`deleted_at` IS NULL AND `id` = 2
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:194
+[0m[33m[1.375ms] [34;1m[rows:1][0m INSERT INTO `initiative_updates` (`initiative_id`,`user_id`,`progress_before`,`progress_after`,`note`,`blocker`,`created_at`) VALUES (2,1,0,80,'Almost done',NULL,'2026-05-19 06:23:04.347')
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:236
+[0m[33m[1.079ms] [34;1m[rows:2][0m SELECT * FROM `initiatives` WHERE parent_id = 1 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:252
+[0m[33m[0.547ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `progress`=40,`updated_at`='2026-05-19 06:23:04.35' WHERE id = 1 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:258
+[0m[33m[0.704ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 1 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:273
+[0m[33m[0.633ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE (key_result_id = 1 AND parent_id IS NULL) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:289
+[0m[33m[1.008ms] [34;1m[rows:1][0m SELECT * FROM `key_results` WHERE `key_results`.`id` = 1 AND `key_results`.`deleted_at` IS NULL ORDER BY `key_results`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:295
+[0m[33m[1.059ms] [34;1m[rows:1][0m UPDATE `key_results` SET `objective_id`=1,`title`='Reduce bugs from 50 to 10',`description`=NULL,`target_value`=50,`current_value`=20,`metric_unit`='bugs fixed',`progress`=40,`confidence_level`=7,`status`='PLANNING',`created_by`=1,`created_at`='2026-05-19 06:23:04.218',`updated_at`='2026-05-19 06:23:04.353',`deleted_at`=NULL WHERE `key_results`.`deleted_at` IS NULL AND `id` = 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:210
+[0m[33m[0.536ms] [34;1m[rows:1][0m SELECT * FROM `key_results` WHERE `key_results`.`id` = 1 AND `key_results`.`deleted_at` IS NULL ORDER BY `key_results`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:300
+[0m[33m[0.541ms] [34;1m[rows:2][0m SELECT * FROM `key_results` WHERE objective_id = 1 AND `key_results`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:314
+[0m[33m[0.534ms] [34;1m[rows:1][0m UPDATE `objectives` SET `progress`=53.335,`updated_at`='2026-05-19 06:23:04.355' WHERE id = 1 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.000ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 2 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 200 |     13.5866ms |             ::1 | PATCH    "/api/initiatives/2/progress"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.821ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 3 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:77
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT count(*) FROM `initiatives` WHERE parent_id = 3 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:174
+[0m[33m[0.539ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `key_result_id`=1,`sprint_id`=NULL,`parent_id`=1,`title`='Fix password reset',`description`=NULL,`assignee_id`=1,`progress`=40,`status`='TODO',`due_date`='2026-04-19 00:00:00',`created_by`=1,`created_at`='2026-05-19 06:23:04.313',`updated_at`='2026-05-19 06:23:04.372',`deleted_at`=NULL WHERE `initiatives`.`deleted_at` IS NULL AND `id` = 3
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:194
+[0m[33m[0.622ms] [34;1m[rows:1][0m INSERT INTO `initiative_updates` (`initiative_id`,`user_id`,`progress_before`,`progress_after`,`note`,`blocker`,`created_at`) VALUES (3,1,0,40,'In progress',NULL,'2026-05-19 06:23:04.373')
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:236
+[0m[33m[0.650ms] [34;1m[rows:2][0m SELECT * FROM `initiatives` WHERE parent_id = 1 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:252
+[0m[33m[0.636ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `progress`=60,`updated_at`='2026-05-19 06:23:04.374' WHERE id = 1 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:258
+[0m[33m[0.777ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 1 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:273
+[0m[33m[1.140ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE (key_result_id = 1 AND parent_id IS NULL) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:289
+[0m[33m[0.549ms] [34;1m[rows:1][0m SELECT * FROM `key_results` WHERE `key_results`.`id` = 1 AND `key_results`.`deleted_at` IS NULL ORDER BY `key_results`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:295
+[0m[33m[0.546ms] [34;1m[rows:1][0m UPDATE `key_results` SET `objective_id`=1,`title`='Reduce bugs from 50 to 10',`description`=NULL,`target_value`=50,`current_value`=30,`metric_unit`='bugs fixed',`progress`=60,`confidence_level`=7,`status`='PLANNING',`created_by`=1,`created_at`='2026-05-19 06:23:04.218',`updated_at`='2026-05-19 06:23:04.377',`deleted_at`=NULL WHERE `key_results`.`deleted_at` IS NULL AND `id` = 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:210
+[0m[33m[0.545ms] [34;1m[rows:1][0m SELECT * FROM `key_results` WHERE `key_results`.`id` = 1 AND `key_results`.`deleted_at` IS NULL ORDER BY `key_results`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:300
+[0m[33m[0.539ms] [34;1m[rows:2][0m SELECT * FROM `key_results` WHERE objective_id = 1 AND `key_results`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:314
+[0m[33m[0.639ms] [34;1m[rows:1][0m UPDATE `objectives` SET `progress`=63.335,`updated_at`='2026-05-19 06:23:04.379' WHERE id = 1 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 3 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+[GIN] 2026/05/19 - 13:23:04 | 200 |     12.8596ms |             ::1 | PATCH    "/api/initiatives/3/progress"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[1.082ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 1 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:77
+[0m[33m[0.845ms] [34;1m[rows:1][0m SELECT count(*) FROM `initiatives` WHERE parent_id = 1 AND `initiatives`.`deleted_at` IS NULL
+[GIN] 2026/05/19 - 13:23:04 | 422 |      1.9266ms |             ::1 | PATCH    "/api/initiatives/1/progress"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 2 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:60
+[0m[33m[3.089ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `key_result_id`=1,`sprint_id`=2,`parent_id`=1,`title`='Fix token expiry',`description`=NULL,`assignee_id`=1,`progress`=80,`status`='IN_PROGRESS',`due_date`='2026-04-18 00:00:00',`created_by`=1,`created_at`='2026-05-19 06:23:04.295',`updated_at`='2026-05-19 06:23:04.411',`deleted_at`=NULL WHERE `initiatives`.`deleted_at` IS NULL AND `id` = 2
+[GIN] 2026/05/19 - 13:23:04 | 200 |      3.9884ms |             ::1 | PATCH    "/api/initiatives/2"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:19
+[0m[33m[0.978ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE `initiatives`.`id` = 1 AND `initiatives`.`deleted_at` IS NULL ORDER BY `initiatives`.`id` LIMIT 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:338
+[0m[33m[1.001ms] [34;1m[rows:2][0m SELECT * FROM `initiatives` WHERE parent_id = 1 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:338
+[0m[33m[1.484ms] [34;1m[rows:0][0m SELECT * FROM `initiatives` WHERE parent_id = 2 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:346
+[0m[33m[1.069ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `deleted_at`='2026-05-19 06:23:04.447' WHERE `initiatives`.`id` = 2 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:338
+[0m[33m[1.687ms] [34;1m[rows:0][0m SELECT * FROM `initiatives` WHERE parent_id = 3 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:346
+[0m[33m[1.091ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `deleted_at`='2026-05-19 06:23:04.45' WHERE `initiatives`.`id` = 3 AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/service.go:332
+[0m[33m[0.632ms] [34;1m[rows:1][0m UPDATE `initiatives` SET `deleted_at`='2026-05-19 06:23:04.452' WHERE `initiatives`.`id` = 1 AND `initiatives`.`deleted_at` IS NULL
+[GIN] 2026/05/19 - 13:23:04 | 200 |     13.2652ms |             ::1 | DELETE   "/api/initiatives/1"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/initiative/repository.go:14
+[0m[33m[2.188ms] [34;1m[rows:1][0m INSERT INTO `initiatives` (`key_result_id`,`sprint_id`,`parent_id`,`title`,`description`,`assignee_id`,`progress`,`status`,`due_date`,`created_by`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,NULL,NULL,'Notif test initiative',NULL,1,0,'TODO','2026-05-19 00:00:00',1,'2026-05-19 06:23:04.473','2026-05-19 06:23:04.473',NULL)
+[GIN] 2026/05/19 - 13:23:04 | 201 |      2.1879ms |             ::1 | POST     "/api/key-results/1/initiatives"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/service.go:56
+[0m[33m[0.506ms] [34;1m[rows:1][0m SELECT * FROM `initiatives` WHERE (assignee_id IS NOT NULL AND due_date IS NOT NULL AND status NOT IN ('DONE', 'CANCELLED')) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/repository.go:51
+[0m[33m[1.673ms] [34;1m[rows:1][0m SELECT count(*) FROM `notification_logs` WHERE initiative_id = 4 AND user_id = 1 AND reminder_key = 'DUE_TODAY'
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/repository.go:14
+[0m[33m[2.193ms] [34;1m[rows:1][0m INSERT INTO `notifications` (`user_id`,`type`,`title`,`message`,`entity_type`,`entity_id`,`is_read`,`created_at`,`read_at`) VALUES (1,'DUE_TODAY','Initiative Due Today','Initiative "Notif test initiative" is due today','initiative',4,false,'2026-05-19 06:23:04.493',NULL)
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/repository.go:56
+[0m[33m[2.651ms] [34;1m[rows:1][0m INSERT INTO `notification_logs` (`initiative_id`,`user_id`,`notification_type`,`reminder_key`,`created_at`) VALUES (4,1,'DUE_TODAY','DUE_TODAY','2026-05-19 06:23:04.493')
+[GIN] 2026/05/19 - 13:23:04 | 200 |      8.1561ms |             ::1 | POST     "/api/notifications/check-due-initiatives"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/repository.go:22
+[0m[33m[0.507ms] [34;1m[rows:1][0m SELECT count(*) FROM `notifications` WHERE user_id = 1
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/repository.go:25
+[0m[33m[0.749ms] [34;1m[rows:1][0m SELECT * FROM `notifications` WHERE user_id = 1 ORDER BY created_at DESC LIMIT 10
+[GIN] 2026/05/19 - 13:23:04 | 200 |      1.9009ms |             ::1 | GET      "/api/notifications?page=1&limit=10"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/repository.go:31
+[0m[33m[0.508ms] [34;1m[rows:1][0m SELECT count(*) FROM `notifications` WHERE user_id = 1 AND is_read = false
+[GIN] 2026/05/19 - 13:23:04 | 200 |       508.1µs |             ::1 | GET      "/api/notifications/unread-count"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/notification/repository.go:44
+[0m[33m[2.120ms] [34;1m[rows:1][0m UPDATE `notifications` SET `is_read`=true,`read_at`=NOW() WHERE user_id = 1 AND is_read = false
+[GIN] 2026/05/19 - 13:23:04 | 200 |      2.5549ms |             ::1 | PATCH    "/api/notifications/read-all"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:22
+[0m[33m[0.512ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:25
+[0m[33m[0.000ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(progress), 0) FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:28
+[0m[33m[0.545ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(confidence_level), 0) FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:31
+[0m[33m[0.547ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 2 AND status = 'ON_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:34
+[0m[33m[0.666ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 2 AND status = 'AT_RISK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:37
+[0m[33m[0.559ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 2 AND status = 'OFF_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:45 [35;1mError 1052 (23000): Column 'status' in where clause is ambiguous
+[0m[33m[1.184ms] [34;1m[rows:0][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 2 WHERE (due_date < '2026-05-19' AND status NOT IN ('DONE', 'CANCELLED')) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:48
+[0m[33m[0.661ms] [34;1m[rows:2][0m SELECT * FROM `initiative_updates` ORDER BY created_at DESC LIMIT 10
+[GIN] 2026/05/19 - 13:23:04 | 200 |      5.8673ms |             ::1 | GET      "/api/dashboard?period_id=2"
+[GIN] 2026/05/19 - 13:23:04 | 400 |            0s |             ::1 | GET      "/api/dashboard"
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:69
+[0m[33m[0.700ms] [34;1m[rows:4][0m SELECT id, quarter FROM `periods` WHERE year = 2026 AND deleted_at IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:84
+[0m[33m[0.000ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE period_id = 1 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:87
+[0m[33m[0.524ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(progress), 0) FROM `objectives` WHERE period_id = 1 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:90
+[0m[33m[0.549ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(confidence_level), 0) FROM `objectives` WHERE period_id = 1 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:93
+[0m[33m[0.712ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 1 AND status = 'ON_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:94
+[0m[33m[0.670ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 1 AND status = 'AT_RISK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:95
+[0m[33m[0.648ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 1 AND status = 'OFF_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:96
+[0m[33m[0.691ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 1 AND status = 'DONE') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:103 [35;1mError 1052 (23000): Column 'status' in where clause is ambiguous
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 1 WHERE (due_date < '2026-05-19' AND status NOT IN ('DONE', 'CANCELLED')) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:84
+[0m[33m[0.558ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:87
+[0m[33m[0.544ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(progress), 0) FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:90
+[0m[33m[0.594ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(confidence_level), 0) FROM `objectives` WHERE period_id = 2 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:93
+[0m[33m[0.522ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 2 AND status = 'ON_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:94
+[0m[33m[0.577ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 2 AND status = 'AT_RISK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:95
+[0m[33m[0.546ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 2 AND status = 'OFF_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:96
+[0m[33m[0.000ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 2 AND status = 'DONE') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:103 [35;1mError 1052 (23000): Column 'status' in where clause is ambiguous
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 2 WHERE (due_date < '2026-05-19' AND status NOT IN ('DONE', 'CANCELLED')) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:84
+[0m[33m[0.000ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE period_id = 3 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:87
+[0m[33m[0.000ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(progress), 0) FROM `objectives` WHERE period_id = 3 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:90
+[0m[33m[0.536ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(confidence_level), 0) FROM `objectives` WHERE period_id = 3 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:93
+[0m[33m[0.548ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 3 AND status = 'ON_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:94
+[0m[33m[0.540ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 3 AND status = 'AT_RISK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:95
+[0m[33m[0.623ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 3 AND status = 'OFF_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:96
+[0m[33m[0.639ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 3 AND status = 'DONE') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:103 [35;1mError 1052 (23000): Column 'status' in where clause is ambiguous
+[0m[33m[0.641ms] [34;1m[rows:0][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 3 WHERE (due_date < '2026-05-19' AND status NOT IN ('DONE', 'CANCELLED')) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:84
+[0m[33m[0.548ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE period_id = 4 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:87
+[0m[33m[0.550ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(progress), 0) FROM `objectives` WHERE period_id = 4 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:90
+[0m[33m[0.542ms] [34;1m[rows:1][0m SELECT COALESCE(AVG(confidence_level), 0) FROM `objectives` WHERE period_id = 4 AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:93
+[0m[33m[0.574ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 4 AND status = 'ON_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:94
+[0m[33m[0.616ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 4 AND status = 'AT_RISK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:95
+[0m[33m[0.601ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 4 AND status = 'OFF_TRACK') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:96
+[0m[33m[0.586ms] [34;1m[rows:1][0m SELECT count(*) FROM `objectives` WHERE (period_id = 4 AND status = 'DONE') AND `objectives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [31;1mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:103 [35;1mError 1052 (23000): Column 'status' in where clause is ambiguous
+[0m[33m[0.550ms] [34;1m[rows:0][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 4 WHERE (due_date < '2026-05-19' AND status NOT IN ('DONE', 'CANCELLED')) AND `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:133
+[0m[33m[0.616ms] [34;1m[rows:1][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 1 WHERE `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:133
+[0m[33m[0.665ms] [34;1m[rows:1][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 2 WHERE `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:133
+[0m[33m[0.645ms] [34;1m[rows:1][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 3 WHERE `initiatives`.`deleted_at` IS NULL
+
+2026/05/19 13:23:04 [32mD:/Zaky/After Graduate/Telkom/kemnaker batch 2/kerjaaaa/Final Project/backend/internal/modules/dashboard/service.go:133
+[0m[33m[0.633ms] [34;1m[rows:1][0m SELECT count(*) FROM `initiatives` JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = 4 WHERE `initiatives`.`deleted_at` IS NULL
+[GIN] 2026/05/19 - 13:23:04 | 200 |     23.6889ms |             ::1 | GET      "/api/dashboard/annual?year=2026"
+[GIN] 2026/05/19 - 13:23:04 | 400 |            0s |             ::1 | GET      "/api/dashboard/annual"
