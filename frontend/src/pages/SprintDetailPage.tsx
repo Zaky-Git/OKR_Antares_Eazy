@@ -384,12 +384,6 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function daysDuration(start: string, end: string): number {
-  const s = new Date(start).getTime();
-  const e = new Date(end).getTime();
-  return Math.max(1, Math.round((e - s) / 86400000) + 1);
-}
-
 function SprintTimelineInfo({ startDate, endDate, status }: { startDate: string; endDate: string; status: string }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);

@@ -708,7 +708,7 @@ function countAllInitiatives(nodes: Initiative[]): number {
   return nodes.reduce((count, node) => count + 1 + (node.children ? countAllInitiatives(node.children) : 0), 0);
 }
 
-function InitNode({ init, depth, krId, onAddChild, onClick, index = 0, highlightedId }: {
+function InitNode({ init, depth, krId, onAddChild, onClick, highlightedId }: {
   init: Initiative; depth: number; krId: number;
   onAddChild: (krId: number, pid: number) => void; onClick: (init: Initiative, krId: number) => void;
   index?: number; highlightedId?: number | null;
