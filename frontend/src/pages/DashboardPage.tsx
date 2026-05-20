@@ -251,7 +251,6 @@ export function DashboardPage() {
                   <DashboardObjectiveCard
                     key={obj.id}
                     objective={obj}
-                    myInitiatives={myInitiatives}
                     onNavigate={() => navigate(`/objectives?highlightObj=${obj.id}`)}
                   />
                 ))
@@ -512,10 +511,9 @@ function getRelativeTime(dateStr: string): string {
   return date.toLocaleDateString('id-ID');
 }
 
-function DashboardObjectiveCard({ objective, myInitiatives, onNavigate }: {
-  objective: Objective; myInitiatives: Initiative[]; onNavigate: () => void;
+function DashboardObjectiveCard({ objective, onNavigate }: {
+  objective: Objective; onNavigate: () => void;
 }) {
-  const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const [expandedKR, setExpandedKR] = useState<number | null>(null);
 

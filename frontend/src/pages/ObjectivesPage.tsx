@@ -683,18 +683,6 @@ function InlineProgress({ initiative }: { initiative: Initiative }) {
   );
 }
 
-function AssigneeAvatar({ assigneeId }: { assigneeId: number }) {
-  const { data: usersRes } = useQuery({ queryKey: ['users'], queryFn: () => authService.getUsers() });
-  const users = usersRes?.data?.data || [];
-  const user = users.find(u => u.id === assigneeId);
-  if (!user) return null;
-  return (
-    <div className="w-5 h-5 rounded-full bg-primary/80 flex items-center justify-center text-white text-[9px] font-bold shrink-0" title={user.name}>
-      {user.name.charAt(0).toUpperCase()}
-    </div>
-  );
-}
-
 function InlineAssign({ initiativeId, assigneeId }: { initiativeId: number; assigneeId: number | null }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
