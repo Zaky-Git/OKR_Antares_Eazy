@@ -21,7 +21,10 @@ export function useWebSocket() {
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = import.meta.env.VITE_API_BASE_URL?.replace(/^https?:\/\//, '').replace(/\/api$/, '') || 'localhost:8080';
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+    const host = apiUrl.startsWith('http')
+      ? apiUrl.replace(/^https?:\/\//, '').replace(/\/api$/, '')
+      : window.location.host;
     const wsUrl = `${protocol}//${host}/api/ws`;
 
     const ws = new WebSocket(wsUrl);
