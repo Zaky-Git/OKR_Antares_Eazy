@@ -8,3 +8,5 @@ export { Badge } from './Badge';
 export { ProgressBar } from './ProgressBar';
 export { YearPicker } from './YearPicker';
 export { default as Dropdown } from './Dropdown';
+export { ColorSwatch } from './ColorSwatch';
+export { ColorPicker } from './ColorPicker';

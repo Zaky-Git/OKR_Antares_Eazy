@@ -28,7 +28,7 @@ export function DetailPanel({ open, onClose, title, children }: Props) {
           </button>
         </div>
 
-        <div className="overflow-y-auto h-[calc(100vh-57px)] p-5">
+        <div className="overflow-y-auto h-[calc(100vh-57px)] p-5 pb-24">
           {children}
         </div>
       </div>

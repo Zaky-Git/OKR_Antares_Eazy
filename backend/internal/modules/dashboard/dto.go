@@ -54,3 +54,31 @@ type ActivityItem struct {
 	InitiativeID *uint   `json:"initiative_id"`
 	CreatedAt    string  `json:"created_at"`
 }
+
+type ContextHealthResponse struct {
+	Strategies []StrategyHealth `json:"strategies"`
+	Divisions  []DivisionHealth `json:"divisions"`
+}
+
+type StrategyHealth struct {
+	ID          uint    `json:"id"`
+	Name        string  `json:"name"`
+	Color       string  `json:"color"`
+	TotalObj    int64   `json:"total_objectives"`
+	AvgProgress float64 `json:"avg_progress"`
+	OnTrack     int64   `json:"on_track"`
+	AtRisk      int64   `json:"at_risk"`
+	OffTrack    int64   `json:"off_track"`
+}
+
+type DivisionHealth struct {
+	ID          uint    `json:"id"`
+	Name        string  `json:"name"`
+	Code        string  `json:"code"`
+	Color       string  `json:"color"`
+	TotalObj    int64   `json:"total_objectives"`
+	AvgProgress float64 `json:"avg_progress"`
+	OnTrack     int64   `json:"on_track"`
+	AtRisk      int64   `json:"at_risk"`
+	OffTrack    int64   `json:"off_track"`
+}

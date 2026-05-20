@@ -37,4 +37,7 @@ export const sprintService = {
 
   assignInitiativeToSprint: (initiativeId: number, data: { sprint_id: number }) =>
     api.patch<ApiResponse<null>>(`/initiatives/${initiativeId}/assign-sprint`, data),
+
+  unassignInitiativeFromSprint: (initiativeId: number) =>
+    api.patch<ApiResponse<null>>(`/initiatives/${initiativeId}/unassign-sprint`),
 };

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation, keepPreviousData } from '@tanstack/react-query';
-import { dashboardService, ActivityItem } from '../services/dashboard.service';
+import { dashboardService, ActivityItem, ContextHealthResponse } from '../services/dashboard.service';
 import { periodService } from '../services/period.service';
 import { objectiveService } from '../services/objective.service';
 import { initiativeService } from '../services/initiative.service';
@@ -83,6 +83,13 @@ export function DashboardPage() {
     enabled: viewMode === 'annual' && !!(selectedPeriod?.year),
   });
 
+  const { data: contextHealthRes } = useQuery({
+    queryKey: ['dashboard', 'context-health', activePeriodId],
+    queryFn: () => dashboardService.getContextHealth(activePeriodId!),
+    enabled: !!activePeriodId && viewMode === 'quarter',
+    placeholderData: keepPreviousData,
+  });
+
   const dashboard = dashRes?.data?.data;
   const objectives = objRes?.data?.data || [];
   const sprints = sprintsRes?.data?.data || [];
@@ -90,6 +97,29 @@ export function DashboardPage() {
   const myInitiatives = myInitRes?.data?.data?.initiatives || [];
   const logs: ActivityItem[] = logsRes?.data?.data || [];
   const annualData = annualRes?.data?.data;
+  const contextHealth = contextHealthRes?.data?.data as ContextHealthResponse | undefined;
+
+  // Count total KRs across all objectives (from objRes meta or objectives data)
+  const totalObjectives = dashboard?.total_objectives || 0;
+
+  // Calculate in-progress initiatives count
+  const inProgressCount = myInitiatives.filter((i: Initiative) => i.status === 'IN_PROGRESS').length;
+
+  // Sprint timeline calculation
+  const getSprintTimelineInfo = () => {
+    if (!activeSprint) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endDate = new Date(activeSprint.end_date);
+    endDate.setHours(0, 0, 0, 0);
+    const diffMs = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays > 0) return { label: `${diffDays} hari tersisa`, isOverdue: false };
+    if (diffDays === 0) return { label: 'Hari terakhir', isOverdue: false };
+    return { label: `Overdue ${Math.abs(diffDays)} hari`, isOverdue: true };
+  };
+
+  const sprintTimeline = getSprintTimelineInfo();
 
   const handleLogClick = (log: ActivityItem) => {
     if (log.initiative_id) {
@@ -102,6 +132,7 @@ export function DashboardPage() {
   return (
     <div className="max-w-full">
 
+      {/* 1. Header */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <h1 className="text-2xl font-bold text-gray-900">Dashboard OKR</h1>
@@ -202,93 +233,160 @@ export function DashboardPage() {
             <DashboardSkeleton />
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              {/* 2. Summary Cards (improved) */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <SummaryCard
-                  label="Active Objectives"
+                  label="Objectives"
                   value={dashboard.total_objectives}
-                  desc={`${dashboard.on_track} on track, ${dashboard.at_risk} at risk`}
+                  desc={`${dashboard.on_track} on track · ${dashboard.at_risk} at risk · ${dashboard.off_track} off track`}
                   icon={<CircleTarget />}
                 />
                 <SummaryCard
                   label="Key Results"
-                value={dashboard.on_track + dashboard.at_risk + dashboard.off_track}
-                desc="Across all objectives"
-                icon={<CheckCircle />}
-              />
-              <SummaryCard
-                label="Initiatives"
-                value={myInitiatives.length}
-                desc="Action items in progress"
-                icon={<TrendUp />}
-              />
-              <SummaryCard
-                label="Overall Progress"
-                value={`${dashboard.avg_progress.toFixed(0)}%`}
-                progress={dashboard.avg_progress}
-                icon={<ProgressCircle />}
-              />
+                  value={dashboard.on_track + dashboard.at_risk + dashboard.off_track}
+                  desc={`Across ${totalObjectives} objectives`}
+                  icon={<CheckCircle />}
+                />
+                <SummaryCard
+                  label="Initiatives"
+                  value={myInitiatives.length}
+                  desc={`${inProgressCount} in progress · ${dashboard.overdue_initiatives} overdue`}
+                  icon={<TrendUp />}
+                />
+                <SummaryCard
+                  label="Overall Progress"
+                  value={`${dashboard.avg_progress.toFixed(0)}%`}
+                  progress={dashboard.avg_progress}
+                  desc="Rata-rata dari semua objectives"
+                  icon={<ProgressCircle />}
+                />
               </div>
 
-          <section className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-0.5">Objectives Aktif</h2>
-                <p className="text-sm text-gray-500">Target utama & initiative Anda untuk quarter ini</p>
-              </div>
-              <button onClick={() => navigate('/objectives')} className="text-xs font-semibold text-primary hover:text-primary-hover flex items-center gap-1">
-                Lihat Semua
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-              </button>
-            </div>
-            <div className="space-y-4">
-              {(!activePeriodId || isObjLoading) ? null : objectives.length === 0 ? (
-                <div className="text-center py-10 bg-white border border-dashed border-gray-200 rounded-xl">
-                  <p className="text-sm text-gray-400 mb-2">Belum ada objective di quarter ini.</p>
-                  <button onClick={() => navigate('/objectives')} className="text-xs font-medium text-primary hover:underline">+ Buat Objective</button>
+              {/* 3. Overdue Alert (conditional) */}
+              {dashboard.overdue_initiatives > 0 && (
+                <div className="mb-6 flex items-center justify-between gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-3.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">⚠</span>
+                    <span className="text-sm font-medium text-red-800">
+                      {dashboard.overdue_initiatives} initiative melewati deadline
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => navigate('/objectives')}
+                    className="text-xs font-semibold text-red-700 hover:text-red-900 border border-red-300 rounded-lg px-3 py-1.5 hover:bg-red-100 transition-colors"
+                  >
+                    Lihat Detail
+                  </button>
                 </div>
-              ) : (
-                objectives.map((obj) => (
-                  <DashboardObjectiveCard
-                    key={obj.id}
-                    objective={obj}
-                    onNavigate={() => navigate(`/objectives?highlightObj=${obj.id}`)}
-                  />
-                ))
               )}
-            </div>
-          </section>
 
-          {activeSprint && (
-            <section className="mb-8">
-              <h2 className="text-lg font-bold text-gray-900 mb-1">Sprint Aktif</h2>
-              <p className="text-sm text-gray-500 mb-4">Sprint yang sedang berjalan</p>
-              <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <div className="flex items-start justify-between mb-3">
+              {/* 5. Context Health (Strategy + Division) */}
+              <ContextHealthSection contextHealth={contextHealth} navigate={navigate} />
+
+              {/* 6. Sprint Aktif (with timeline) */}
+              {activeSprint ? (
+                <section className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-900 mb-0.5">Sprint Aktif</h2>
+                      <p className="text-sm text-gray-500">Fokus kerja saat ini — update progress di sini</p>
+                    </div>
+                    <button onClick={() => navigate(`/sprints/${activeSprint.id}`)} className="text-xs font-semibold text-primary hover:text-primary-hover flex items-center gap-1">
+                      Buka Sprint Board
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+                    </button>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-primary/30 transition-colors cursor-pointer" onClick={() => navigate(`/sprints/${activeSprint.id}`)}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{activeSprint.name}</h3>
+                        <p className="text-sm text-gray-500">
+                          {new Date(activeSprint.start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} — {new Date(activeSprint.end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {sprintTimeline && (
+                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${
+                            sprintTimeline.isOverdue
+                              ? 'bg-red-50 text-red-700 border-red-200'
+                              : 'bg-blue-50 text-blue-700 border-blue-200'
+                          }`}>
+                            {sprintTimeline.label}
+                          </span>
+                        )}
+                        <span className="px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200">Active</span>
+                      </div>
+                    </div>
+                    {myInitiatives.length > 0 && (
+                      <>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xs text-gray-500">Sprint Progress</span>
+                          <span className="text-xs font-semibold text-gray-700">
+                            {(myInitiatives.reduce((sum: number, i: Initiative) => sum + i.progress, 0) / myInitiatives.length).toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+                          <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${myInitiatives.reduce((sum: number, i: Initiative) => sum + i.progress, 0) / myInitiatives.length}%` }} />
+                        </div>
+                        <p className="text-xs text-gray-400">{myInitiatives.length} initiative{myInitiatives.length !== 1 ? 's' : ''} di sprint ini</p>
+                      </>
+                    )}
+                    {myInitiatives.length === 0 && (
+                      <p className="text-xs text-gray-400 italic">Belum ada initiative di sprint ini. Assign dari halaman Objectives.</p>
+                    )}
+                  </div>
+                </section>
+              ) : (
+                <section className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-900 mb-0.5">Sprint Aktif</h2>
+                      <p className="text-sm text-gray-500">Fokus kerja saat ini</p>
+                    </div>
+                  </div>
+                  <div className="bg-white border border-dashed border-gray-200 rounded-xl p-5 text-center">
+                    <p className="text-sm text-gray-400 mb-2">Tidak ada sprint aktif. Buat sprint baru.</p>
+                    <button onClick={() => navigate('/sprints')} className="text-xs font-medium text-primary hover:underline">
+                      Ke halaman Sprints →
+                    </button>
+                  </div>
+                </section>
+              )}
+
+              {/* 7. Objectives Quarter (with count) */}
+              <section className="mb-8">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{activeSprint.name}</h3>
+                    <h2 className="text-lg font-bold text-gray-900 mb-0.5">Objectives Quarter</h2>
                     <p className="text-sm text-gray-500">
-                      {new Date(activeSprint.start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} — {new Date(activeSprint.end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {objectives.length > 0
+                        ? `Menampilkan ${objectives.length} dari ${totalObjectives} objectives`
+                        : 'Target strategis & progress OKR untuk quarter ini'
+                      }
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded">active</span>
+                  <button onClick={() => navigate('/objectives')} className="text-xs font-semibold text-primary hover:text-primary-hover flex items-center gap-1">
+                    Lihat Semua
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+                  </button>
                 </div>
-                {myInitiatives.length > 0 && (
-                  <>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs text-gray-500">Progress</span>
-                      <span className="text-xs font-semibold text-gray-700">
-                        {(myInitiatives.reduce((sum, i) => sum + i.progress, 0) / myInitiatives.length).toFixed(0)}%
-                      </span>
+                <div className="space-y-4">
+                  {(!activePeriodId || isObjLoading) ? null : objectives.length === 0 ? (
+                    <div className="text-center py-10 bg-white border border-dashed border-gray-200 rounded-xl">
+                      <p className="text-sm text-gray-400 mb-2">Belum ada objective di quarter ini.</p>
+                      <button onClick={() => navigate('/objectives')} className="text-xs font-medium text-primary hover:underline">+ Buat Objective</button>
                     </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
-                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${myInitiatives.reduce((sum, i) => sum + i.progress, 0) / myInitiatives.length}%` }} />
-                    </div>
-                    <p className="text-xs text-gray-400">{myInitiatives.length} initiatives</p>
-                  </>
-                )}
-              </div>
-            </section>
-          )}
+                  ) : (
+                    objectives.map((obj) => (
+                      <DashboardObjectiveCard
+                        key={obj.id}
+                        objective={obj}
+                        onNavigate={() => navigate(`/objectives?highlightObj=${obj.id}`)}
+                      />
+                    ))
+                  )}
+                </div>
+              </section>
             </>
           )}
         </>
@@ -349,6 +447,7 @@ export function DashboardPage() {
         <div className="text-center py-12 text-gray-400 text-sm">Memuat data tahunan...</div>
       )}
 
+      {/* 8. Aktivitas Terbaru */}
       {logs.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-4">
@@ -414,7 +513,7 @@ function SummaryCard({ label, value, desc, icon, progress }: {
           <div className="h-full bg-primary rounded-full" style={{ width: `${progress}%` }} />
         </div>
       )}
-      {desc && <p className="text-xs text-gray-400">{desc}</p>}
+      {desc && <p className="text-xs text-gray-400 mt-1">{desc}</p>}
     </div>
   );
 }
@@ -500,15 +599,82 @@ function DashboardSkeleton() {
   );
 }
 
-function getRelativeTime(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (diff < 60) return 'Baru saja';
-  if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)} hari lalu`;
-  return date.toLocaleDateString('id-ID');
+function ContextHealthSection({ contextHealth, navigate }: {
+  contextHealth: ContextHealthResponse | undefined;
+  navigate: (path: string) => void;
+}) {
+  if (!contextHealth) return null;
+
+  const strategies = contextHealth.strategies?.filter(s => s.total_objectives > 0) || [];
+  const divisions = contextHealth.divisions?.filter(d => d.total_objectives > 0) || [];
+
+  if (strategies.length === 0 && divisions.length === 0) {
+    return null;
+  }
+
+  const getProgressBarColor = (progress: number) => {
+    if (progress >= 70) return 'bg-emerald-500';
+    if (progress >= 40) return 'bg-primary';
+    return 'bg-gray-400';
+  };
+
+  return (
+    <section className="mb-8">
+      <div className={`grid gap-4 ${strategies.length > 0 && divisions.length > 0 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+        {strategies.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h3 className="text-sm font-bold text-gray-900 mb-4">Progress per Strategy</h3>
+            <div className="space-y-3">
+              {strategies.map(s => (
+                <div
+                  key={s.id}
+                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-lg p-1.5 -mx-1.5 transition-colors"
+                  onClick={() => navigate(`/objectives?strategy_id=${s.id}`)}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                  <span className="text-sm font-medium text-gray-700 truncate min-w-0 flex-1">{s.name}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${getProgressBarColor(s.avg_progress)} transition-all`} style={{ width: `${s.avg_progress}%` }} />
+                    </div>
+                    <span className="text-xs font-semibold text-gray-600 w-8 text-right">{s.avg_progress.toFixed(0)}%</span>
+                    <span className="text-[11px] text-gray-400 w-10 text-right">{s.total_objectives} obj</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {divisions.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h3 className="text-sm font-bold text-gray-900 mb-4">Progress per Divisi</h3>
+            <div className="space-y-3">
+              {divisions.map(d => (
+                <div
+                  key={d.id}
+                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-lg p-1.5 -mx-1.5 transition-colors"
+                  onClick={() => navigate(`/objectives?division_id=${d.id}`)}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                  <span className="text-sm font-medium text-gray-700 truncate min-w-0 flex-1">
+                    {d.name}{d.code ? ` (${d.code})` : ''}
+                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${getProgressBarColor(d.avg_progress)} transition-all`} style={{ width: `${d.avg_progress}%` }} />
+                    </div>
+                    <span className="text-xs font-semibold text-gray-600 w-8 text-right">{d.avg_progress.toFixed(0)}%</span>
+                    <span className="text-[11px] text-gray-400 w-10 text-right">{d.total_objectives} obj</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }
 
 function DashboardObjectiveCard({ objective, onNavigate }: {
@@ -683,4 +849,15 @@ function DashboardInitProgress({ initiative, parentTitle }: { initiative: Initia
       )}
     </div>
   );
+}
+
+function getRelativeTime(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 60) return 'Baru saja';
+  if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} hari lalu`;
+  return date.toLocaleDateString('id-ID');
 }

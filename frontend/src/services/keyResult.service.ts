@@ -13,4 +13,7 @@ export const keyResultService = {
 
   delete: (id: number) =>
     api.delete<ApiResponse<null>>(`/key-results/${id}`),
+
+  toggleMilestone: (id: number) =>
+    api.patch<ApiResponse<KeyResult>>(`/key-results/${id}/toggle-milestone`),
 };

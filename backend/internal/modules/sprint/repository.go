@@ -10,6 +10,7 @@ type SprintInitiativeRow struct {
 	KeyResultID    uint    `json:"key_result_id"`
 	SprintID       *uint   `json:"sprint_id"`
 	ParentID       *uint   `json:"parent_id"`
+	ParentTitle    *string `json:"parent_title"`
 	Title          string  `json:"title"`
 	Description    *string `json:"description"`
 	AssigneeID     *uint   `json:"assignee_id"`
@@ -20,6 +21,7 @@ type SprintInitiativeRow struct {
 	ObjectiveTitle string  `json:"objective_title"`
 	KeyResultTitle string  `json:"key_result_title"`
 	CreatedBy      uint    `json:"created_by"`
+	HasChildren    bool    `json:"has_children"`
 }
 
 // SprintSummaryRow represents a raw query result for sprint summary aggregation
@@ -86,6 +88,7 @@ func (r *Repository) GetSprintInitiatives(sprintID uint) ([]SprintInitiativeRow,
 			i.key_result_id,
 			i.sprint_id,
 			i.parent_id,
+			p_init.title AS parent_title,
 			i.title,
 			i.description,
 			i.assignee_id,
@@ -95,13 +98,16 @@ func (r *Repository) GetSprintInitiatives(sprintID uint) ([]SprintInitiativeRow,
 			DATE_FORMAT(i.due_date, '%Y-%m-%d') AS due_date,
 			o.title AS objective_title,
 			kr.title AS key_result_title,
-			i.created_by
+			i.created_by,
+			(SELECT COUNT(*) > 0 FROM initiatives c WHERE c.parent_id = i.id AND c.deleted_at IS NULL) AS has_children
 		FROM initiatives i
 		JOIN key_results kr ON kr.id = i.key_result_id AND kr.deleted_at IS NULL
 		JOIN objectives o ON o.id = kr.objective_id AND o.deleted_at IS NULL
 		LEFT JOIN users u ON u.id = i.assignee_id AND u.deleted_at IS NULL
+		LEFT JOIN initiatives p_init ON p_init.id = i.parent_id AND p_init.deleted_at IS NULL
 		WHERE i.sprint_id = ? AND i.deleted_at IS NULL
-		ORDER BY i.status, i.title
+			AND NOT EXISTS(SELECT 1 FROM initiatives c WHERE c.parent_id = i.id AND c.deleted_at IS NULL)
+		ORDER BY i.parent_id IS NULL DESC, i.parent_id, i.status, i.title
 	`, sprintID).Scan(&rows).Error
 	return rows, err
 }
@@ -127,7 +133,7 @@ func (r *Repository) GetSprintSummary(sprintID uint) (*SprintSummaryRow, error) 
 	return &row, nil
 }
 
-// GetBacklogInitiatives returns initiatives without a sprint assignment in the same period
+// GetBacklogInitiatives returns leaf initiatives without a sprint assignment in the same period
 func (r *Repository) GetBacklogInitiatives(periodID uint) ([]SprintInitiativeRow, error) {
 	var rows []SprintInitiativeRow
 	err := r.db.Raw(`
@@ -136,6 +142,7 @@ func (r *Repository) GetBacklogInitiatives(periodID uint) ([]SprintInitiativeRow
 			i.key_result_id,
 			i.sprint_id,
 			i.parent_id,
+			p_init.title AS parent_title,
 			i.title,
 			i.description,
 			i.assignee_id,
@@ -150,9 +157,11 @@ func (r *Repository) GetBacklogInitiatives(periodID uint) ([]SprintInitiativeRow
 		JOIN key_results kr ON kr.id = i.key_result_id AND kr.deleted_at IS NULL
 		JOIN objectives o ON o.id = kr.objective_id AND o.deleted_at IS NULL
 		LEFT JOIN users u ON u.id = i.assignee_id AND u.deleted_at IS NULL
+		LEFT JOIN initiatives p_init ON p_init.id = i.parent_id AND p_init.deleted_at IS NULL
 		WHERE i.sprint_id IS NULL
 			AND i.deleted_at IS NULL
 			AND o.period_id = ?
+			AND NOT EXISTS(SELECT 1 FROM initiatives c WHERE c.parent_id = i.id AND c.deleted_at IS NULL)
 		ORDER BY i.status, i.title
 	`, periodID).Scan(&rows).Error
 	return rows, err

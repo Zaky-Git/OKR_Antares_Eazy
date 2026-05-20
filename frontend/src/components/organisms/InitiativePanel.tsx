@@ -6,7 +6,8 @@ import { periodService } from '../../services/period.service';
 import { authService } from '../../services/auth.service';
 import { Initiative, User } from '../../types';
 import toast from 'react-hot-toast';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import Dropdown from '../atomics/Dropdown';
 
 interface Props {
   initiative?: Initiative | null;
@@ -15,6 +16,11 @@ interface Props {
   onClose: () => void;
   onOpenChild?: (child: Initiative) => void;
   onBack?: () => void;
+  context?: {
+    objectiveTitle?: string;
+    keyResultTitle?: string;
+    parentTitle?: string;
+  };
 }
 
 interface FormData {
@@ -26,9 +32,11 @@ interface FormData {
   status: string;
   progress: number;
   note: string;
+  support_needed: string;
+  notes: string;
 }
 
-export function InitiativePanel({ initiative, keyResultId, parentId, onClose, onOpenChild, onBack }: Props) {
+export function InitiativePanel({ initiative, keyResultId, parentId, onClose, onOpenChild, onBack, context }: Props) {
   const queryClient = useQueryClient();
   const isEdit = !!initiative;
   const hasChildren = initiative?.children && initiative.children.length > 0;
@@ -59,7 +67,7 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
 
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const payload = { title: data.title, description: data.description || undefined, due_date: data.due_date || undefined, sprint_id: data.sprint_id ? Number(data.sprint_id) : undefined, assignee_id: data.assignee_id ? Number(data.assignee_id) : undefined, status: data.status };
+      const payload = { title: data.title, description: data.description || undefined, due_date: data.due_date || undefined, sprint_id: data.sprint_id ? Number(data.sprint_id) : undefined, assignee_id: data.assignee_id ? Number(data.assignee_id) : undefined, status: data.status, support_needed: data.support_needed.trim() || undefined, notes: data.notes.trim() || undefined };
 
       if (isEdit) {
 
@@ -105,6 +113,9 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
       await queryClient.invalidateQueries({ queryKey: ['initiative-tree'] });
       queryClient.invalidateQueries({ queryKey: ['key-results'] });
       queryClient.invalidateQueries({ queryKey: ['objectives'] });
+      queryClient.invalidateQueries({ queryKey: ['sprint-initiatives'] });
+      queryClient.invalidateQueries({ queryKey: ['sprint-summary'] });
+      queryClient.invalidateQueries({ queryKey: ['sprint-backlog'] });
       setChildTitle('');
       setShowAddChild(false);
     },
@@ -128,6 +139,32 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
         </div>
         {isEdit && <IStatusDot status={initiative!.status} />}
       </div>
+
+      {/* Context breadcrumb tree */}
+      {context && (context.objectiveTitle || context.keyResultTitle || context.parentTitle) && (
+        <div className="mb-4 px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-100">
+          <div className="text-[11px] text-gray-500">
+            {context.objectiveTitle && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-gray-400 font-medium">OBJ</span>
+                <span className="truncate">{context.objectiveTitle}</span>
+              </div>
+            )}
+            {context.keyResultTitle && (
+              <div className="flex items-start gap-1.5 ml-2 mt-0.5">
+                <span className="text-gray-300 leading-none">├─</span>
+                <span className="truncate">{context.keyResultTitle}</span>
+              </div>
+            )}
+            {context.parentTitle && (
+              <div className="flex items-start gap-1.5 ml-5 mt-0.5">
+                <span className="text-gray-300 leading-none">└─</span>
+                <span className="truncate">{context.parentTitle}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit((data) => saveMutation.mutate(data))} className="space-y-4">
 
@@ -202,13 +239,15 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Sprint</label>
-            <div className="relative">
-              <select {...register('sprint_id')} className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 appearance-none pr-9 cursor-pointer">
-                <option value="">—</option>
-                {sprints.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
-            </div>
+            <Dropdown
+              options={[
+                { value: '', label: '—' },
+                ...sprints.map(s => ({ value: String(s.id), label: s.name }))
+              ]}
+              value={watch('sprint_id')}
+              onChange={(v) => setValue('sprint_id', String(v), { shouldDirty: true })}
+              placeholder="—"
+            />
           </div>
         </div>
 
@@ -226,6 +265,17 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
             </div>
           </div>
         )}
+
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Support Needed</label>
+          <textarea {...register('support_needed')} rows={2} placeholder="Apa yang dibutuhkan dari tim/divisi lain? (opsional)" className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-none" />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Notes</label>
+          <textarea {...register('notes')} rows={2} placeholder="Catatan tambahan, kendala, atau info (opsional)" className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-none" />
+        </div>
 
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -246,24 +296,54 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
 
       {isEdit && (
         <div className="mt-6 pt-5 border-t border-gray-100">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Sub-Initiatives</h4>
-          <ChildList parentId={initiative!.id} onOpenChild={onOpenChild} />
-          {!showAddChild ? (
-            <button type="button" onClick={() => setShowAddChild(true)} className="w-full mt-2 px-4 py-2.5 text-sm font-medium text-gray-600 border border-dashed border-gray-300 rounded-lg hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg>
-              Tambah Sub-Initiative
-            </button>
-          ) : (
-            <div className="mt-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
-              <input value={childTitle} onChange={(e) => setChildTitle(e.target.value)} placeholder="Nama sub-initiative" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2 focus:outline-none focus:border-primary" autoFocus />
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Sub-Initiatives</h4>
+            {!showAddChild && (
+              <button
+                type="button"
+                onClick={() => setShowAddChild(true)}
+                className="px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5 rounded-md transition-colors flex items-center gap-1"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
+                Tambah
+              </button>
+            )}
+          </div>
+
+          {showAddChild && (
+            <div className="mb-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
               <div className="flex gap-2">
-                <button type="button" onClick={() => childMutation.mutate()} disabled={!childTitle.trim() || childMutation.isPending} className="px-3 py-1.5 text-xs font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover disabled:opacity-50">
-                  {childMutation.isPending ? '...' : 'Simpan'}
+                <input
+                  value={childTitle}
+                  onChange={(e) => setChildTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && childTitle.trim()) {
+                      e.preventDefault();
+                      childMutation.mutate();
+                    }
+                    if (e.key === 'Escape') {
+                      setShowAddChild(false);
+                      setChildTitle('');
+                    }
+                  }}
+                  placeholder="Nama sub-initiative..."
+                  className="flex-1 min-w-0 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 bg-white"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => childMutation.mutate()}
+                  disabled={!childTitle.trim() || childMutation.isPending}
+                  className="px-3 py-2 text-xs font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover disabled:opacity-50 flex-shrink-0"
+                >
+                  {childMutation.isPending ? '...' : 'Tambah'}
                 </button>
-                <button type="button" onClick={() => { setShowAddChild(false); setChildTitle(''); }} className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700">Batal</button>
               </div>
+              <p className="text-[10px] text-gray-400 mt-1.5 px-1">Enter untuk simpan, Esc untuk batal</p>
             </div>
           )}
+
+          <ChildList parentId={initiative!.id} keyResultId={keyResultId} onOpenChild={onOpenChild} />
         </div>
       )}
     </div>
@@ -280,29 +360,21 @@ function getDefaults(initiative?: Initiative | null): FormData {
     status: initiative?.status || 'TODO',
     progress: initiative?.progress || 0,
     note: '',
+    support_needed: initiative?.support_needed || '',
+    notes: initiative?.notes || '',
   };
 }
 
-function ChildList({ parentId, onOpenChild }: { parentId: number; onOpenChild?: (child: Initiative) => void }) {
-  const queryClient = useQueryClient();
+function ChildList({ parentId, keyResultId, onOpenChild }: { parentId: number; keyResultId: number; onOpenChild?: (child: Initiative) => void }) {
+  const { data } = useQuery({
+    queryKey: ['initiative-tree', keyResultId],
+    queryFn: () => initiativeService.getTree(keyResultId),
+  });
 
-
-  const [children, setChildren] = useState<Initiative[]>([]);
-
-  useEffect(() => {
-
-    const findChildren = () => {
-      const queries = queryClient.getQueriesData<any>({ queryKey: ['initiative-tree'] });
-      for (const [, data] of queries) {
-        const found = findInTree(data?.data?.data || [], parentId);
-        if (found) { setChildren(found); return; }
-      }
-      setChildren([]);
-    };
-    findChildren();
-    const unsub = queryClient.getQueryCache().subscribe(() => findChildren());
-    return () => unsub();
-  }, [parentId, queryClient]);
+  const children = useMemo(() => {
+    const tree = data?.data?.data || [];
+    return findInTree(tree, parentId) || [];
+  }, [data, parentId]);
 
   if (children.length === 0) return null;
 

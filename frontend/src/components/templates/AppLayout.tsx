@@ -11,6 +11,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/sprints') return 'Sprints';
   if (pathname === '/logs') return 'Activity Log';
   if (pathname === '/notifications') return 'Notifications';
+  if (pathname === '/admin/masters') return 'Master Data';
   return 'Dashboard';
 }
 

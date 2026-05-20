@@ -7,6 +7,7 @@ import { ObjectiveDetailPage } from '../pages/ObjectiveDetailPage';
 import { SprintsPage } from '../pages/SprintsPage';
 import { SprintDetailPage } from '../pages/SprintDetailPage';
 import { LogsPage } from '../pages/LogsPage';
+import { MasterAdminPage } from '../pages/MasterAdminPage';
 import { AppLayout } from '../components/templates/AppLayout';
 import { AuthLayout } from '../components/templates/AuthLayout';
 import { ProtectedRoute } from '../guards/ProtectedRoute';
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
       { path: '/sprints', element: <SprintsPage /> },
       { path: '/sprints/:id', element: <SprintDetailPage /> },
       { path: '/logs', element: <LogsPage /> },
+      { path: '/admin/masters', element: <MasterAdminPage /> },
     ],
   },
 ]);

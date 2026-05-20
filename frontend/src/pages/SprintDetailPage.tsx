@@ -6,7 +6,6 @@ import { periodService } from '../services/period.service';
 import { SprintBoard } from '../components/organisms/SprintBoard';
 import { SprintSummary } from '../components/organisms/SprintSummary';
 import { BacklogPanel } from '../components/organisms/BacklogPanel';
-import { TimelineIndicator } from '../components/organisms/TimelineIndicator';
 import CompleteSprintModal from '../components/organisms/CompleteSprintModal';
 import { DetailPanel } from '../components/organisms/DetailPanel';
 import { InitiativePanel } from '../components/organisms/InitiativePanel';
@@ -39,6 +38,13 @@ export function SprintDetailPage() {
   });
   const period = periodRes?.data?.data?.find(p => p.id === sprint?.period_id);
 
+  const { data: backlogRes } = useQuery({
+    queryKey: ['sprint-backlog', sprintId],
+    queryFn: () => sprintService.getSprintBacklog(sprintId),
+    enabled: !!sprintId,
+  });
+  const backlogData: SprintInitiative[] = backlogRes?.data?.data || [];
+
   const activateMutation = useMutation({
     mutationFn: () => sprintService.activate(sprintId),
     onSuccess: () => {
@@ -60,6 +66,29 @@ export function SprintDetailPage() {
 
   const handleInitiativeClick = (initiative: SprintInitiative) => {
     setSelectedInitiative(initiative);
+  };
+
+  const handleOpenChild = (child: Initiative) => {
+    // Convert Initiative to SprintInitiative format for the panel
+    const asSprintInit: SprintInitiative = {
+      id: child.id,
+      key_result_id: child.key_result_id,
+      sprint_id: child.sprint_id,
+      parent_id: child.parent_id,
+      parent_title: selectedInitiative?.title || null,
+      title: child.title,
+      description: child.description || null,
+      assignee_id: child.assignee_id || null,
+      assignee_name: null,
+      progress: child.progress,
+      status: child.status,
+      due_date: child.due_date,
+      objective_title: selectedInitiative?.objective_title || '',
+      key_result_title: selectedInitiative?.key_result_title || '',
+      created_by: child.created_by,
+      has_children: !!(child.children && child.children.length > 0),
+    };
+    setSelectedInitiative(asSprintInit);
   };
 
   const handleDrawerClose = () => {
@@ -154,27 +183,34 @@ export function SprintDetailPage() {
                   <span className="font-medium text-gray-700">Goal:</span> {sprint.goal}
                 </p>
               )}
-              <div className="flex items-center flex-wrap gap-x-5 gap-y-1.5 text-xs text-gray-500">
-                <span className="flex items-center gap-1.5">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
+                {/* Date range */}
+                <div className="flex items-center gap-2 text-xs">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2">
                     <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  {formatDate(sprint.start_date)} — {formatDate(sprint.end_date)}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" />
+                  <span className="font-medium text-gray-700">{formatDate(sprint.start_date)}</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
                   </svg>
-                  {daysDuration(sprint.start_date, sprint.end_date)} hari
-                </span>
+                  <span className="font-medium text-gray-700">{formatDate(sprint.end_date)}</span>
+                </div>
+
+                <span className="text-gray-300">·</span>
+
+                {/* Quarter */}
                 {period && (
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 text-xs text-gray-500">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
                     </svg>
-                    {period.quarter} {period.year}
+                    <span className="font-medium">{period.quarter} {period.year}</span>
                   </span>
                 )}
+
+                {/* Timeline status (combines duration + remaining into one clear info) */}
+                <span className="text-gray-300">·</span>
+                <SprintTimelineInfo startDate={sprint.start_date} endDate={sprint.end_date} status={sprint.status} />
               </div>
             </div>
 
@@ -231,15 +267,10 @@ export function SprintDetailPage() {
         </div>
       </div>
 
-      {/* Timeline Indicator (ACTIVE only) */}
-      {isActive && (
-        <TimelineIndicator startDate={sprint.start_date} endDate={sprint.end_date} status={sprint.status} />
-      )}
-
       {/* Sprint Summary */}
       <SprintSummary sprintId={sprintId} />
 
-      {/* Sprint Board */}
+      {/* Sprint Board + Backlog (shared DndContext) */}
       <div className="bg-white border border-gray-200 rounded-2xl p-5 md:p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -247,21 +278,25 @@ export function SprintDetailPage() {
             <p className="text-xs text-gray-500 mt-0.5">Klik card untuk update status atau progress</p>
           </div>
         </div>
-        <SprintBoard sprintId={sprintId} onInitiativeClick={handleInitiativeClick} />
+        <SprintBoard
+          sprintId={sprintId}
+          onInitiativeClick={handleInitiativeClick}
+          backlogItems={backlogData}
+          backlogNode={
+            (isPlanning || isActive) ? (
+              <div className="bg-white border border-gray-200 rounded-2xl p-5 md:p-6 mt-6 -mx-5 md:-mx-6 -mb-5 md:-mb-6 border-t rounded-t-none">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900">Backlog</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">Drag ke kolom board di atas untuk assign ke sprint</p>
+                  </div>
+                </div>
+                <BacklogPanel sprintId={sprintId} />
+              </div>
+            ) : undefined
+          }
+        />
       </div>
-
-      {/* Backlog Panel (PLANNING and ACTIVE only) */}
-      {(isPlanning || isActive) && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 md:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-base font-bold text-gray-900">Backlog</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Initiative yang belum ditugaskan ke sprint manapun</p>
-            </div>
-          </div>
-          <BacklogPanel sprintId={sprintId} />
-        </div>
-      )}
 
       {/* Review/Retro Notes for COMPLETED sprints */}
       {isCompleted && (sprint.review_note || sprint.retro_note) && (
@@ -318,6 +353,12 @@ export function SprintDetailPage() {
             initiative={initiativeForPanel}
             keyResultId={selectedInitiative.key_result_id}
             onClose={handleDrawerSaveSuccess}
+            onOpenChild={handleOpenChild}
+            context={{
+              objectiveTitle: selectedInitiative.objective_title,
+              keyResultTitle: selectedInitiative.key_result_title,
+              parentTitle: selectedInitiative.parent_title || undefined,
+            }}
           />
         )}
       </DetailPanel>
@@ -348,3 +389,65 @@ function daysDuration(start: string, end: string): number {
   const e = new Date(end).getTime();
   return Math.max(1, Math.round((e - s) / 86400000) + 1);
 }
+
+function SprintTimelineInfo({ startDate, endDate, status }: { startDate: string; endDate: string; status: string }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+
+  const totalDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
+  const elapsed = Math.round((today.getTime() - start.getTime()) / 86400000) + 1;
+  const isActive = status === 'ACTIVE';
+  const isPlanning = status === 'PLANNING';
+  const isCompleted = status === 'COMPLETED';
+
+  // Planning: just show duration
+  if (isPlanning) {
+    return (
+      <span className="text-xs text-gray-500">
+        Durasi <span className="font-medium text-gray-700">{totalDays} hari</span>
+      </span>
+    );
+  }
+
+  // Completed: show "Selesai N hari"
+  if (isCompleted) {
+    return (
+      <span className="text-xs text-gray-500">
+        Berlangsung <span className="font-medium text-gray-700">{totalDays} hari</span>
+      </span>
+    );
+  }
+
+  // Active: show day progress with appropriate color
+  if (isActive) {
+    const isOverdue = elapsed > totalDays;
+    const remaining = Math.max(0, totalDays - elapsed);
+    const currentDay = Math.min(Math.max(elapsed, 1), totalDays);
+
+    if (isOverdue) {
+      const overdueDays = elapsed - totalDays;
+      return (
+        <span className="px-2 py-0.5 text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200 rounded-full">
+          Terlambat {overdueDays} hari
+        </span>
+      );
+    }
+
+    const colorClass = remaining <= 2
+      ? 'text-amber-700 bg-amber-50 border-amber-200'
+      : 'text-emerald-700 bg-emerald-50 border-emerald-200';
+
+    return (
+      <span className={`px-2 py-0.5 text-[11px] font-semibold rounded-full border ${colorClass}`}>
+        Hari {currentDay}/{totalDays} · Sisa {remaining} hari
+      </span>
+    );
+  }
+
+  return null;
+}
+

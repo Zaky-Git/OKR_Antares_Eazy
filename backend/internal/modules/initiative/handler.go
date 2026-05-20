@@ -243,6 +243,35 @@ func (h *Handler) AssignSprint(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Initiative assigned to sprint successfully", nil)
 }
 
+func (h *Handler) UnassignSprint(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid initiative ID", nil)
+		return
+	}
+
+	userID := c.GetUint("user_id")
+	if err := h.service.UnassignFromSprint(uint(id), userID); err != nil {
+		switch err.Error() {
+		case "initiative not found":
+			response.Error(c, http.StatusNotFound, err.Error(), nil)
+		case "forbidden":
+			response.Error(c, http.StatusForbidden, "You are not the owner/assignee of this initiative", nil)
+		case "initiative is not assigned to any sprint":
+			response.Error(c, http.StatusUnprocessableEntity, err.Error(), nil)
+		default:
+			response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		}
+		return
+	}
+
+	h.actLogger.Log(userID, activitylog.ActionUpdate, activitylog.EntityInitiative, uint(id), "",
+		activitylog.WithInitiativeID(uint(id)),
+		activitylog.WithDescription("mengeluarkan initiative dari sprint"))
+
+	response.Success(c, http.StatusOK, "Initiative removed from sprint successfully", nil)
+}
+
 func (h *Handler) Delete(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

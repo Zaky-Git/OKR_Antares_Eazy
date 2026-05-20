@@ -6,12 +6,15 @@ import (
 	"github.com/antares-eazy/okr-backend/internal/modules/activitylog"
 	"github.com/antares-eazy/okr-backend/internal/modules/auth"
 	"github.com/antares-eazy/okr-backend/internal/modules/dashboard"
+	"github.com/antares-eazy/okr-backend/internal/modules/division"
 	"github.com/antares-eazy/okr-backend/internal/modules/initiative"
 	"github.com/antares-eazy/okr-backend/internal/modules/keyresult"
 	"github.com/antares-eazy/okr-backend/internal/modules/notification"
 	"github.com/antares-eazy/okr-backend/internal/modules/objective"
 	"github.com/antares-eazy/okr-backend/internal/modules/period"
+	"github.com/antares-eazy/okr-backend/internal/modules/segment"
 	"github.com/antares-eazy/okr-backend/internal/modules/sprint"
+	"github.com/antares-eazy/okr-backend/internal/modules/strategy"
 	"github.com/antares-eazy/okr-backend/internal/ws"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -31,6 +34,9 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	initiativeRepo := initiative.NewRepository(db)
 	notificationRepo := notification.NewRepository(db)
 	activityRepo := activitylog.NewRepository(db)
+	strategyRepo := strategy.NewRepository(db)
+	segmentRepo := segment.NewRepository(db)
+	divisionRepo := division.NewRepository(db)
 
 
 	authService := auth.NewService(authRepo, cfg)
@@ -42,6 +48,9 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	initiativeService := initiative.NewService(initiativeRepo, krRepo, objectiveRepo)
 	notificationService := notification.NewService(notificationRepo, initiativeRepo)
 	dashboardService := dashboard.NewService(db)
+	strategyService := strategy.NewService(strategyRepo)
+	segmentService := segment.NewService(segmentRepo)
+	divisionService := division.NewService(divisionRepo)
 
 
 	authHandler := auth.NewHandler(authService)
@@ -52,6 +61,9 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	initiativeHandler := initiative.NewHandler(initiativeService, activityService)
 	notificationHandler := notification.NewHandler(notificationService)
 	dashboardHandler := dashboard.NewHandler(dashboardService)
+	strategyHandler := strategy.NewHandler(strategyService, activityService)
+	segmentHandler := segment.NewHandler(segmentService, activityService)
+	divisionHandler := division.NewHandler(divisionService, activityService)
 
 
 	api := r.Group("/api")
@@ -106,6 +118,7 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		protected.POST("/objectives/:id/key-results", krHandler.Create)
 		protected.PATCH("/key-results/:id", krHandler.Update)
 		protected.DELETE("/key-results/:id", krHandler.Delete)
+		protected.PATCH("/key-results/:id/toggle-milestone", krHandler.ToggleMilestone)
 
 
 		protected.GET("/initiatives/my-active-sprint", initiativeHandler.GetMyActiveSprintInitiatives)
@@ -115,6 +128,7 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		protected.PATCH("/initiatives/:id", initiativeHandler.Update)
 		protected.PATCH("/initiatives/:id/progress", initiativeHandler.UpdateProgress)
 		protected.PATCH("/initiatives/:id/assign-sprint", initiativeHandler.AssignSprint)
+		protected.PATCH("/initiatives/:id/unassign-sprint", initiativeHandler.UnassignSprint)
 		protected.DELETE("/initiatives/:id", initiativeHandler.Delete)
 
 
@@ -127,7 +141,28 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 		protected.GET("/dashboard", dashboardHandler.GetDashboard)
 		protected.GET("/dashboard/annual", dashboardHandler.GetAnnualDashboard)
+		protected.GET("/dashboard/context-health", dashboardHandler.GetContextHealth)
 		protected.GET("/search", dashboardHandler.Search)
 		protected.GET("/logs", dashboardHandler.GetActivities)
+
+
+		// Master data: Strategy, Segment, Division
+		protected.GET("/strategies", strategyHandler.List)
+		protected.POST("/strategies", strategyHandler.Create)
+		protected.GET("/strategies/:id", strategyHandler.GetByID)
+		protected.PATCH("/strategies/:id", strategyHandler.Update)
+		protected.DELETE("/strategies/:id", strategyHandler.Delete)
+
+		protected.GET("/segments", segmentHandler.List)
+		protected.POST("/segments", segmentHandler.Create)
+		protected.GET("/segments/:id", segmentHandler.GetByID)
+		protected.PATCH("/segments/:id", segmentHandler.Update)
+		protected.DELETE("/segments/:id", segmentHandler.Delete)
+
+		protected.GET("/divisions", divisionHandler.List)
+		protected.POST("/divisions", divisionHandler.Create)
+		protected.GET("/divisions/:id", divisionHandler.GetByID)
+		protected.PATCH("/divisions/:id", divisionHandler.Update)
+		protected.DELETE("/divisions/:id", divisionHandler.Delete)
 	}
 }

@@ -245,6 +245,7 @@ func (s *Service) GetSprintInitiatives(sprintID uint) ([]SprintInitiativeRespons
 			KeyResultID:    row.KeyResultID,
 			SprintID:       row.SprintID,
 			ParentID:       row.ParentID,
+			ParentTitle:    row.ParentTitle,
 			Title:          row.Title,
 			Description:    row.Description,
 			AssigneeID:     row.AssigneeID,
@@ -255,6 +256,7 @@ func (s *Service) GetSprintInitiatives(sprintID uint) ([]SprintInitiativeRespons
 			ObjectiveTitle: row.ObjectiveTitle,
 			KeyResultTitle: row.KeyResultTitle,
 			CreatedBy:      row.CreatedBy,
+			HasChildren:    row.HasChildren,
 		}
 	}
 	return responses, nil
@@ -295,6 +297,7 @@ func (s *Service) GetSprintBacklog(sprintID uint) ([]SprintInitiativeResponse, e
 			KeyResultID:    row.KeyResultID,
 			SprintID:       row.SprintID,
 			ParentID:       row.ParentID,
+			ParentTitle:    row.ParentTitle,
 			Title:          row.Title,
 			Description:    row.Description,
 			AssigneeID:     row.AssigneeID,

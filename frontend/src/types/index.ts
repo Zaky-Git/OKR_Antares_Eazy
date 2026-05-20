@@ -38,16 +38,32 @@ export interface Objective {
   created_by: number;
   created_at: string;
   updated_at: string;
+  // Phase 1: okr-objective-context fields
+  strategy_id?: number | null;
+  segment_id?: number | null;
+  division_id?: number | null;
+  owner_id?: number | null;
+  notes?: string | null;
+  strategy?: { id: number; name: string; color: string } | null;
+  segment?: { id: number; name: string; color: string } | null;
+  division?: { id: number; name: string; code: string; color: string } | null;
+  owner?: { id: number; name: string; email: string } | null;
 }
+
+export type KRType = 'METRIC' | 'MILESTONE';
 
 export interface KeyResult {
   id: number;
   objective_id: number;
   title: string;
   description: string | null;
+  kr_type?: string;
   target_value: number;
   current_value: number;
+  baseline_value?: number | null;
   metric_unit: string | null;
+  due_date?: string | null;
+  notes?: string | null;
   progress: number;
   status: string;
   created_by: number;
@@ -66,6 +82,8 @@ export interface Initiative {
   progress: number;
   status: string;
   due_date: string | null;
+  support_needed?: string | null;
+  notes?: string | null;
   created_by: number;
   created_at: string;
   updated_at: string;
@@ -137,6 +155,7 @@ export interface SprintInitiative {
   key_result_id: number;
   sprint_id: number | null;
   parent_id: number | null;
+  parent_title: string | null;
   title: string;
   description: string | null;
   assignee_id: number | null;
@@ -147,6 +166,7 @@ export interface SprintInitiative {
   objective_title: string;
   key_result_title: string;
   created_by: number;
+  has_children: boolean;
 }
 
 export interface SprintSummary {

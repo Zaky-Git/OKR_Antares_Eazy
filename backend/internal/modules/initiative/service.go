@@ -2,6 +2,7 @@ package initiative
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/antares-eazy/okr-backend/internal/modules/keyresult"
@@ -34,15 +35,22 @@ func (s *Service) Create(keyResultID uint, req CreateRequest, userID uint) (*Ini
 		dueDate = &d
 	}
 
+	var supportNeeded *string
+	if req.SupportNeeded != nil && strings.TrimSpace(*req.SupportNeeded) != "" {
+		trimmed := strings.TrimSpace(*req.SupportNeeded)
+		supportNeeded = &trimmed
+	}
+
 	initiative := &Initiative{
-		KeyResultID: keyResultID,
-		SprintID:    req.SprintID,
-		Title:       req.Title,
-		Description: description,
-		AssigneeID:  req.AssigneeID,
-		Status:      "TODO",
-		DueDate:     dueDate,
-		CreatedBy:   userID,
+		KeyResultID:   keyResultID,
+		SprintID:      req.SprintID,
+		Title:         req.Title,
+		Description:   description,
+		AssigneeID:    req.AssigneeID,
+		SupportNeeded: supportNeeded,
+		Status:        "TODO",
+		DueDate:       dueDate,
+		CreatedBy:     userID,
 	}
 
 	err := s.repo.GetDB().Transaction(func(tx *gorm.DB) error {
@@ -87,9 +95,15 @@ func (s *Service) CreateChild(parentID uint, req CreateRequest, userID uint) (*I
 		dueDate = &d
 	}
 
+	// Inherit sprint_id from parent if not explicitly provided
+	sprintID := req.SprintID
+	if sprintID == nil && parent.SprintID != nil {
+		sprintID = parent.SprintID
+	}
+
 	child := &Initiative{
 		KeyResultID: parent.KeyResultID,
-		SprintID:    req.SprintID,
+		SprintID:    sprintID,
 		ParentID:    &parentID,
 		Title:       req.Title,
 		Description: description,
@@ -197,6 +211,22 @@ func (s *Service) Update(id uint, req UpdateRequest, userID uint) (*InitiativeRe
 				return nil, errors.New("invalid due_date format")
 			}
 			initiative.DueDate = &d
+		}
+	}
+	if req.SupportNeeded != nil {
+		trimmed := strings.TrimSpace(*req.SupportNeeded)
+		if trimmed == "" {
+			initiative.SupportNeeded = nil
+		} else {
+			initiative.SupportNeeded = &trimmed
+		}
+	}
+	if req.Notes != nil {
+		trimmed := strings.TrimSpace(*req.Notes)
+		if trimmed == "" {
+			initiative.Notes = nil
+		} else {
+			initiative.Notes = &trimmed
 		}
 	}
 
@@ -359,12 +389,17 @@ func (s *Service) recalculateKeyResult(tx *gorm.DB, keyResultID uint) error {
 		return err
 	}
 
-	if len(rootInitiatives) == 0 {
+	var kr keyresult.KeyResult
+	if err := tx.First(&kr, keyResultID).Error; err != nil {
+		return err
+	}
 
-		var kr keyresult.KeyResult
-		if err := tx.First(&kr, keyResultID).Error; err != nil {
-			return err
-		}
+	// MILESTONE KRs: progress is binary (0 or 100 based on status), skip initiative-based recalc
+	if kr.EffectiveType() == keyresult.KRTypeMilestone {
+		return nil
+	}
+
+	if len(rootInitiatives) == 0 {
 		kr.Progress = 0
 		kr.CurrentValue = 0
 		return tx.Save(&kr).Error
@@ -376,14 +411,13 @@ func (s *Service) recalculateKeyResult(tx *gorm.DB, keyResultID uint) error {
 	}
 	avg := total / float64(len(rootInitiatives))
 
-
-	var kr keyresult.KeyResult
-	if err := tx.First(&kr, keyResultID).Error; err != nil {
-		return err
+	// Baseline-aware current_value calculation
+	baseline := 0.0
+	if kr.BaselineValue != nil {
+		baseline = *kr.BaselineValue
 	}
-
+	kr.CurrentValue = baseline + (avg/100)*(kr.TargetValue-baseline)
 	kr.Progress = avg
-	kr.CurrentValue = (avg / 100) * kr.TargetValue
 	return tx.Save(&kr).Error
 }
 
@@ -434,12 +468,38 @@ func (s *Service) AssignToSprint(initiativeID uint, sprintID uint, userID uint) 
 		return errors.New("cannot assign initiatives to a completed sprint")
 	}
 
+	// Reject parent initiatives — only leaf initiatives can be assigned to sprints
+	hasChildren, _ := s.repo.HasChildren(initiativeID)
+	if hasChildren {
+		return errors.New("cannot assign parent initiative to sprint. Assign its sub-initiatives instead")
+	}
+
 	// Call repository (validates initiative exists and sprint_id is NULL)
 	if err := s.repo.AssignToSprint(initiativeID, sprintID); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *Service) UnassignFromSprint(initiativeID uint, userID uint) error {
+	initiative, err := s.repo.FindByID(initiativeID)
+	if err != nil {
+		return errors.New("initiative not found")
+	}
+
+	// Check ownership
+	if initiative.CreatedBy != userID && (initiative.AssigneeID == nil || *initiative.AssigneeID != userID) {
+		return errors.New("forbidden")
+	}
+
+	if initiative.SprintID == nil {
+		return errors.New("initiative is not assigned to any sprint")
+	}
+
+	// Set sprint_id to NULL
+	initiative.SprintID = nil
+	return s.repo.Update(initiative)
 }
 
 func (s *Service) Delete(id uint, userID uint) error {

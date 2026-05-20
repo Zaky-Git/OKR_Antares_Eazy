@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sprintService } from '../../services/sprint.service';
 import { initiativeService } from '../../services/initiative.service';
@@ -13,17 +13,44 @@ import {
   useDroppable,
   useSensor,
   useSensors,
+  pointerWithin,
 } from '@dnd-kit/core';
 import { useDraggable } from '@dnd-kit/core';
+import type { Modifier } from '@dnd-kit/core';
 import toast from 'react-hot-toast';
+import { useState } from 'react';
+
+// Snap drag overlay center to cursor position (works for any sized source element)
+const snapCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
+  if (!draggingNodeRect || !activatorEvent) return transform;
+  const event = activatorEvent as PointerEvent | MouseEvent;
+  let clientX: number;
+  let clientY: number;
+  if ('clientX' in event && typeof event.clientX === 'number') {
+    clientX = event.clientX;
+    clientY = event.clientY;
+  } else {
+    return transform;
+  }
+  const offsetX = clientX - draggingNodeRect.left;
+  const offsetY = clientY - draggingNodeRect.top;
+  return {
+    ...transform,
+    x: transform.x + offsetX - draggingNodeRect.width / 2,
+    y: transform.y + offsetY - draggingNodeRect.height / 2,
+  };
+};
 
 interface Props {
   sprintId: number;
   onInitiativeClick?: (initiative: SprintInitiative) => void;
+  /** Backlog items — rendered as draggable below the board within the same DndContext */
+  backlogNode?: React.ReactNode;
+  backlogItems?: SprintInitiative[];
 }
 
-const STATUS_COLUMNS = ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE', 'CANCELLED'] as const;
-type StatusKey = typeof STATUS_COLUMNS[number];
+export const STATUS_COLUMNS = ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE', 'CANCELLED'] as const;
+export type StatusKey = typeof STATUS_COLUMNS[number];
 
 const COLUMN_CONFIG: Record<StatusKey, { label: string; dotColor: string; ringColor: string }> = {
   TODO: { label: 'To Do', dotColor: 'bg-gray-400', ringColor: 'ring-gray-300' },
@@ -45,16 +72,15 @@ function groupByStatus(initiatives: SprintInitiative[]): Record<StatusKey, Sprin
   return grouped;
 }
 
-export function SprintBoard({ sprintId, onInitiativeClick }: Props) {
+export function SprintBoard({ sprintId, onInitiativeClick, backlogNode, backlogItems = [] }: Props) {
   const queryClient = useQueryClient();
-  const [activeInitiative, setActiveInitiative] = useState<SprintInitiative | null>(null);
+  const [activeItem, setActiveItem] = useState<SprintInitiative | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['sprint-initiatives', sprintId],
     queryFn: () => sprintService.getSprintInitiatives(sprintId),
   });
 
-  // Normalize response (could be array or grouped)
   const initiatives: SprintInitiative[] = useMemo(() => {
     const rawData = data?.data?.data;
     if (Array.isArray(rawData)) return rawData;
@@ -70,7 +96,6 @@ export function SprintBoard({ sprintId, onInitiativeClick }: Props) {
     mutationFn: ({ id, status }: { id: number; status: string }) =>
       initiativeService.update(id, { status }),
     onMutate: async ({ id, status }) => {
-      // Optimistic update
       await queryClient.cancelQueries({ queryKey: ['sprint-initiatives', sprintId] });
       const previous = queryClient.getQueryData<any>(['sprint-initiatives', sprintId]);
       queryClient.setQueryData(['sprint-initiatives', sprintId], (old: any) => {
@@ -100,31 +125,78 @@ export function SprintBoard({ sprintId, onInitiativeClick }: Props) {
       queryClient.invalidateQueries({ queryKey: ['initiative-tree'] });
       queryClient.invalidateQueries({ queryKey: ['key-results'] });
       queryClient.invalidateQueries({ queryKey: ['objectives'] });
+      queryClient.invalidateQueries({ queryKey: ['sprint-backlog', sprintId] });
     },
   });
+
+  const unassignMutation = useMutation({
+    mutationFn: (initiativeId: number) =>
+      sprintService.unassignInitiativeFromSprint(initiativeId),
+    onSuccess: () => {
+      toast.success('Initiative dikeluarkan dari sprint');
+      queryClient.invalidateQueries({ queryKey: ['sprint-initiatives', sprintId] });
+      queryClient.invalidateQueries({ queryKey: ['sprint-summary', sprintId] });
+      queryClient.invalidateQueries({ queryKey: ['sprint-backlog', sprintId] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || 'Gagal mengeluarkan initiative');
+    },
+  });
+
+  const handleRemoveFromSprint = (initiative: SprintInitiative) => {
+    unassignMutation.mutate(initiative.id);
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   );
 
+  // Track if drag source is from backlog (wider element) to snap overlay to cursor
   const handleDragStart = (event: DragStartEvent) => {
-    const id = Number(event.active.id);
-    const found = initiatives.find((i) => i.id === id);
-    if (found) setActiveInitiative(found);
+    const rawId = String(event.active.id);
+    const isBacklog = rawId.startsWith('backlog-');
+    const numId = isBacklog ? Number(rawId.replace('backlog-', '')) : Number(rawId);
+
+    if (isBacklog) {
+      const found = backlogItems.find((i) => i.id === numId);
+      if (found) setActiveItem(found);
+    } else {
+      const found = initiatives.find((i) => i.id === numId);
+      if (found) setActiveItem(found);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    setActiveInitiative(null);
+    setActiveItem(null);
     const { active, over } = event;
     if (!over) return;
 
-    const initiativeId = Number(active.id);
+    const rawId = String(active.id);
+    const isBacklog = rawId.startsWith('backlog-');
+    const initiativeId = isBacklog ? Number(rawId.replace('backlog-', '')) : Number(rawId);
     const targetStatus = String(over.id) as StatusKey;
-    const initiative = initiatives.find((i) => i.id === initiativeId);
-    if (!initiative || initiative.status === targetStatus) return;
     if (!STATUS_COLUMNS.includes(targetStatus)) return;
 
-    updateStatusMutation.mutate({ id: initiativeId, status: targetStatus });
+    if (isBacklog) {
+      // Backlog item → assign to sprint + set status
+      sprintService.assignInitiativeToSprint(initiativeId, { sprint_id: sprintId }).then(() => {
+        if (targetStatus !== 'TODO') {
+          return initiativeService.update(initiativeId, { status: targetStatus });
+        }
+      }).then(() => {
+        toast.success('Initiative di-assign ke sprint');
+        queryClient.invalidateQueries({ queryKey: ['sprint-initiatives', sprintId] });
+        queryClient.invalidateQueries({ queryKey: ['sprint-summary', sprintId] });
+        queryClient.invalidateQueries({ queryKey: ['sprint-backlog', sprintId] });
+      }).catch((err: any) => {
+        toast.error(err?.response?.data?.message || 'Gagal assign initiative');
+      });
+    } else {
+      // Board item → just change status
+      const initiative = initiatives.find((i) => i.id === initiativeId);
+      if (!initiative || initiative.status === targetStatus) return;
+      updateStatusMutation.mutate({ id: initiativeId, status: targetStatus });
+    }
   };
 
   if (isLoading) {
@@ -141,40 +213,43 @@ export function SprintBoard({ sprintId, onInitiativeClick }: Props) {
     );
   }
 
-  if (initiatives.length === 0) {
-    return (
-      <div className="text-center py-12 bg-gray-50/50 border border-dashed border-gray-200 rounded-xl">
-        <div className="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3 shadow-sm">
-          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6" />
-          </svg>
-        </div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-1">Belum ada initiative</h3>
-        <p className="text-xs text-gray-500 max-w-xs mx-auto">
-          Assign initiative dari halaman Objectives, atau dari panel Backlog di bawah.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-        {STATUS_COLUMNS.map((status) => (
-          <BoardColumn
-            key={status}
-            status={status}
-            items={grouped[status]}
-            onInitiativeClick={onInitiativeClick}
-            isDragActive={!!activeInitiative}
-          />
-        ))}
-      </div>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={pointerWithin}>
+      {/* Board columns */}
+      {initiatives.length === 0 && backlogItems.length === 0 ? (
+        <div className="text-center py-12 bg-gray-50/50 border border-dashed border-gray-200 rounded-xl">
+          <div className="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3 shadow-sm">
+            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6" />
+            </svg>
+          </div>
+          <h3 className="text-sm font-semibold text-gray-700 mb-1">Belum ada initiative</h3>
+          <p className="text-xs text-gray-500 max-w-xs mx-auto">
+            Assign initiative dari halaman Objectives, atau dari panel Backlog di bawah.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+          {STATUS_COLUMNS.map((status) => (
+            <BoardColumn
+              key={status}
+              status={status}
+              items={grouped[status]}
+              onInitiativeClick={onInitiativeClick}
+              onRemoveFromSprint={handleRemoveFromSprint}
+              isDragActive={!!activeItem}
+            />
+          ))}
+        </div>
+      )}
 
-      <DragOverlay dropAnimation={null}>
-        {activeInitiative ? (
-          <div className="rotate-2 opacity-95 shadow-lg">
-            <InitiativeCard initiative={activeInitiative} onClick={() => {}} />
+      {/* Backlog section (inside same DndContext so drag works) */}
+      {backlogNode}
+
+      <DragOverlay dropAnimation={null} modifiers={[snapCenterToCursor]}>
+        {activeItem ? (
+          <div className="opacity-95 shadow-xl w-[220px]">
+            <InitiativeCard initiative={activeItem} onClick={() => {}} />
           </div>
         ) : null}
       </DragOverlay>
@@ -182,20 +257,22 @@ export function SprintBoard({ sprintId, onInitiativeClick }: Props) {
   );
 }
 
+// --- Board Column ---
+
 interface BoardColumnProps {
   status: StatusKey;
   items: SprintInitiative[];
   onInitiativeClick?: (initiative: SprintInitiative) => void;
+  onRemoveFromSprint: (initiative: SprintInitiative) => void;
   isDragActive: boolean;
 }
 
-function BoardColumn({ status, items, onInitiativeClick, isDragActive }: BoardColumnProps) {
+function BoardColumn({ status, items, onInitiativeClick, onRemoveFromSprint, isDragActive }: BoardColumnProps) {
   const config = COLUMN_CONFIG[status];
   const { setNodeRef, isOver } = useDroppable({ id: status });
 
   return (
     <div className="flex flex-col">
-      {/* Column header */}
       <div className="flex items-center justify-between px-2 mb-2.5">
         <div className="flex items-center gap-2">
           <span className={`w-1.5 h-1.5 rounded-full ${config.dotColor}`} />
@@ -206,7 +283,6 @@ function BoardColumn({ status, items, onInitiativeClick, isDragActive }: BoardCo
         </span>
       </div>
 
-      {/* Droppable area */}
       <div
         ref={setNodeRef}
         className={`flex-1 rounded-xl p-2 space-y-2 min-h-[160px] transition-colors border ${
@@ -229,6 +305,7 @@ function BoardColumn({ status, items, onInitiativeClick, isDragActive }: BoardCo
               key={initiative.id}
               initiative={initiative}
               onClick={onInitiativeClick}
+              onRemoveFromSprint={onRemoveFromSprint}
             />
           ))
         )}
@@ -237,24 +314,25 @@ function BoardColumn({ status, items, onInitiativeClick, isDragActive }: BoardCo
   );
 }
 
-interface DraggableInitiativeProps {
-  initiative: SprintInitiative;
-  onClick?: (initiative: SprintInitiative) => void;
-}
+// --- Draggable Initiative (board cards) ---
 
-function DraggableInitiative({ initiative, onClick }: DraggableInitiativeProps) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: initiative.id,
-  });
+function DraggableInitiative({ initiative, onClick, onRemoveFromSprint }: { initiative: SprintInitiative; onClick?: (i: SprintInitiative) => void; onRemoveFromSprint: (i: SprintInitiative) => void }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: initiative.id });
 
   return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      className={`touch-none ${isDragging ? 'opacity-30' : ''}`}
-    >
-      <InitiativeCard initiative={initiative} onClick={onClick || (() => {})} />
+    <div ref={setNodeRef} {...attributes} {...listeners} className={`touch-none ${isDragging ? 'opacity-30' : ''}`}>
+      <InitiativeCard initiative={initiative} onClick={onClick || (() => {})} onRemoveFromSprint={onRemoveFromSprint} />
+    </div>
+  );
+}
+
+// --- Draggable Backlog Item (exported for use in BacklogPanel) ---
+export function DraggableBacklogItem({ id, children }: { id: number; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: `backlog-${id}` });
+
+  return (
+    <div ref={setNodeRef} {...attributes} {...listeners} className={`touch-none cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-30 scale-[0.98]' : ''} transition-all`}>
+      {children}
     </div>
   );
 }

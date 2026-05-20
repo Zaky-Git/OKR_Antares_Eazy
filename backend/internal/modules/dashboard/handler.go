@@ -84,3 +84,25 @@ func (h *Handler) GetActivities(c *gin.Context) {
 		TotalPages: totalPages,
 	})
 }
+
+func (h *Handler) GetContextHealth(c *gin.Context) {
+	periodIDStr := c.Query("period_id")
+	if periodIDStr == "" {
+		response.Error(c, http.StatusBadRequest, "period_id is required", nil)
+		return
+	}
+
+	periodID, err := strconv.ParseUint(periodIDStr, 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid period_id", nil)
+		return
+	}
+
+	result, err := h.service.GetContextHealth(uint(periodID))
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "Failed to fetch context health", nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Success", result)
+}

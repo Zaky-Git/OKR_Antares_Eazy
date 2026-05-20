@@ -1,6 +1,8 @@
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sprintService } from '../../services/sprint.service';
 import { SprintInitiative } from '../../types';
+import { DraggableBacklogItem } from './SprintBoard';
 import toast from 'react-hot-toast';
 
 interface Props {
@@ -23,6 +25,8 @@ const STATUS_LABEL: Record<string, string> = {
   CANCELLED: 'Cancelled',
 };
 
+const FILTER_STATUSES = ['ALL', 'TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'] as const;
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
@@ -35,6 +39,8 @@ function getInitials(name: string): string {
 
 export function BacklogPanel({ sprintId }: Props) {
   const queryClient = useQueryClient();
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   const { data, isLoading } = useQuery({
     queryKey: ['sprint-backlog', sprintId],
@@ -56,6 +62,29 @@ export function BacklogPanel({ sprintId }: Props) {
   });
 
   const backlogItems: SprintInitiative[] = data?.data?.data || [];
+
+  const filteredItems = useMemo(() => {
+    let items = backlogItems;
+
+    // Filter by status
+    if (statusFilter !== 'ALL') {
+      items = items.filter(i => i.status === statusFilter);
+    }
+
+    // Filter by search
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      items = items.filter(i =>
+        i.title.toLowerCase().includes(q) ||
+        (i.objective_title && i.objective_title.toLowerCase().includes(q)) ||
+        (i.key_result_title && i.key_result_title.toLowerCase().includes(q)) ||
+        (i.parent_title && i.parent_title.toLowerCase().includes(q)) ||
+        (i.assignee_name && i.assignee_name.toLowerCase().includes(q))
+      );
+    }
+
+    return items;
+  }, [backlogItems, statusFilter, search]);
 
   if (isLoading) {
     return (
@@ -86,10 +115,53 @@ export function BacklogPanel({ sprintId }: Props) {
   }
 
   return (
-    <div className="space-y-2">
-      {backlogItems.map((item) => (
+    <div className="space-y-3">
+      {/* Search + Filter */}
+      <div className="space-y-2">
+        <div className="flex gap-1 flex-wrap">
+          {FILTER_STATUSES.map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-colors ${
+                statusFilter === s
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {s === 'ALL' ? 'Semua' : STATUS_LABEL[s] || s}
+            </button>
+          ))}
+        </div>
+        <div className="relative">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari initiative..."
+            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+          />
+        </div>
+      </div>
+
+      {/* Count */}
+      <p className="text-[11px] text-gray-400">
+        {filteredItems.length} dari {backlogItems.length} initiative
+      </p>
+
+      {/* List */}
+      {filteredItems.length === 0 ? (
+        <div className="text-center py-6">
+          <p className="text-sm text-gray-400">Tidak ada initiative yang cocok</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filteredItems.map((item) => (
+        <DraggableBacklogItem key={item.id} id={item.id}>
         <div
-          key={item.id}
           className="bg-white border border-gray-200 rounded-xl p-3.5 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-start gap-3">
@@ -99,7 +171,9 @@ export function BacklogPanel({ sprintId }: Props) {
               {/* Breadcrumb */}
               {(item.objective_title || item.key_result_title) && (
                 <p className="text-[11px] text-gray-400 truncate mb-0.5">
-                  {item.objective_title} <span className="text-gray-300">›</span> {item.key_result_title}
+                  <span className="text-gray-500 font-medium">OBJ</span> {item.objective_title}
+                  {item.key_result_title && <><span className="text-gray-300"> › </span><span className="text-gray-500 font-medium">KR</span> {item.key_result_title}</>}
+                  {item.parent_title && <><span className="text-gray-300"> › </span><span className="text-gray-500 font-medium">↳</span> {item.parent_title}</>}
                 </p>
               )}
 
@@ -168,7 +242,10 @@ export function BacklogPanel({ sprintId }: Props) {
             </button>
           </div>
         </div>
+        </DraggableBacklogItem>
       ))}
+        </div>
+      )}
     </div>
   );
 }

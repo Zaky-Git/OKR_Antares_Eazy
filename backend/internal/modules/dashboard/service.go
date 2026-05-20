@@ -5,8 +5,10 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/antares-eazy/okr-backend/internal/modules/division"
 	"github.com/antares-eazy/okr-backend/internal/modules/initiative"
 	"github.com/antares-eazy/okr-backend/internal/modules/objective"
+	"github.com/antares-eazy/okr-backend/internal/modules/strategy"
 )
 
 type Service struct {
@@ -201,4 +203,70 @@ func (s *Service) GetActivities(page, limit int) ([]ActivityItem, int64, error) 
 	}
 
 	return activities, total, nil
+}
+
+func (s *Service) GetContextHealth(periodID uint) (*ContextHealthResponse, error) {
+	// Query active strategies
+	var strategies []strategy.Strategy
+	s.db.Where("is_active = ?", true).Order("sort_order ASC, name ASC").Find(&strategies)
+
+	var strategyHealths []StrategyHealth
+	for _, st := range strategies {
+		var totalObj int64
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND strategy_id = ?", periodID, st.ID).Count(&totalObj)
+
+		var avgProgress float64
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND strategy_id = ?", periodID, st.ID).Select("COALESCE(AVG(progress), 0)").Scan(&avgProgress)
+
+		var onTrack, atRisk, offTrack int64
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND strategy_id = ? AND status = ?", periodID, st.ID, "ON_TRACK").Count(&onTrack)
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND strategy_id = ? AND status = ?", periodID, st.ID, "AT_RISK").Count(&atRisk)
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND strategy_id = ? AND status = ?", periodID, st.ID, "OFF_TRACK").Count(&offTrack)
+
+		strategyHealths = append(strategyHealths, StrategyHealth{
+			ID:          st.ID,
+			Name:        st.Name,
+			Color:       st.Color,
+			TotalObj:    totalObj,
+			AvgProgress: avgProgress,
+			OnTrack:     onTrack,
+			AtRisk:      atRisk,
+			OffTrack:    offTrack,
+		})
+	}
+
+	// Query active divisions
+	var divisions []division.Division
+	s.db.Where("is_active = ?", true).Order("name ASC").Find(&divisions)
+
+	var divisionHealths []DivisionHealth
+	for _, div := range divisions {
+		var totalObj int64
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND division_id = ?", periodID, div.ID).Count(&totalObj)
+
+		var avgProgress float64
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND division_id = ?", periodID, div.ID).Select("COALESCE(AVG(progress), 0)").Scan(&avgProgress)
+
+		var onTrack, atRisk, offTrack int64
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND division_id = ? AND status = ?", periodID, div.ID, "ON_TRACK").Count(&onTrack)
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND division_id = ? AND status = ?", periodID, div.ID, "AT_RISK").Count(&atRisk)
+		s.db.Model(&objective.Objective{}).Where("period_id = ? AND division_id = ? AND status = ?", periodID, div.ID, "OFF_TRACK").Count(&offTrack)
+
+		divisionHealths = append(divisionHealths, DivisionHealth{
+			ID:          div.ID,
+			Name:        div.Name,
+			Code:        div.Code,
+			Color:       div.Color,
+			TotalObj:    totalObj,
+			AvgProgress: avgProgress,
+			OnTrack:     onTrack,
+			AtRisk:      atRisk,
+			OffTrack:    offTrack,
+		})
+	}
+
+	return &ContextHealthResponse{
+		Strategies: strategyHealths,
+		Divisions:  divisionHealths,
+	}, nil
 }

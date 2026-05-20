@@ -11,8 +11,12 @@ import { DetailPanel } from '../components/organisms/DetailPanel';
 import { ObjectivePanel } from '../components/organisms/ObjectivePanel';
 import { KeyResultPanel } from '../components/organisms/KeyResultPanel';
 import { InitiativePanel } from '../components/organisms/InitiativePanel';
+import { ContextBadges } from '../components/organisms/ContextBadges';
+import { OwnerAvatar } from '../components/organisms/OwnerAvatar';
+import { FilterChips, FilterChipsState } from '../components/organisms/FilterChips';
 import { YearPicker } from '../components/atomics';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../stores/useAuthStore';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -39,6 +43,7 @@ export function ObjectivesPage() {
   const [expandedObj, setExpandedObj] = useState<Set<number>>(new Set());
   const [panel, setPanel] = useState<PanelState>({ type: 'none' });
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [contextFilter, setContextFilter] = useState<FilterChipsState>({ strategyId: null, segmentId: null, divisionId: null });
   const [highlightedInitiativeId, setHighlightedInitiativeId] = useState<number | null>(null);
   const [highlightedObjId, setHighlightedObjId] = useState<number | null>(null);
   const [highlightedKRId, setHighlightedKRId] = useState<number | null>(null);
@@ -51,8 +56,14 @@ export function ObjectivesPage() {
   const selectedPeriod = periods.find(p => p.id === activePeriodId) || currentPeriod;
 
   const { data: objRes, isLoading } = useQuery({
-    queryKey: ['objectives', activePeriodId],
-    queryFn: () => objectiveService.getByPeriod(activePeriodId!, 1, 50),
+    queryKey: ['objectives', activePeriodId, contextFilter.strategyId, contextFilter.segmentId, contextFilter.divisionId],
+    queryFn: () => objectiveService.getByPeriod(activePeriodId!, {
+      page: 1,
+      limit: 50,
+      strategy_id: contextFilter.strategyId ?? undefined,
+      segment_id: contextFilter.segmentId ?? undefined,
+      division_id: contextFilter.divisionId ?? undefined,
+    }),
     enabled: !!activePeriodId,
     placeholderData: keepPreviousData,
   });
@@ -243,6 +254,11 @@ export function ObjectivesPage() {
         ))}
       </div>
 
+      {/* Context filter chips: Strategy / Segment / Division */}
+      <div className="bg-white border border-gray-200 rounded-xl p-3 mb-5">
+        <FilterChips value={contextFilter} onChange={setContextFilter} />
+      </div>
+
 
       {(isLoading || isPeriodLoading) ? (
         <div className="flex items-center justify-center py-20">
@@ -353,9 +369,19 @@ function ObjectiveCard({ objective, expanded, onToggle, onDetail, onAddKR, onCli
             <span className="text-[10px] font-bold text-gray-400">#{number}</span>
             <h3 className="text-base font-bold text-gray-900">{objective.title}</h3>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            <OwnerAvatar owner={objective.owner} size={28} />
             <StatusBadge status={objective.status} />
           </div>
+        </div>
+
+        {/* Context badges */}
+        <div className="mb-3">
+          <ContextBadges
+            strategy={objective.strategy}
+            segment={objective.segment}
+            division={objective.division}
+          />
         </div>
 
 
@@ -420,29 +446,121 @@ function KRCard({ kr, onClick, onAddInit, onAddChild, onClickInit, highlightedIn
 }) {
   const [expanded, setExpanded] = useState(true);
   const isHighlighted = highlightedKRId === kr.id;
+  const queryClient = useQueryClient();
+  const user = useAuthStore((s) => s.user);
+  const isMilestone = (kr.kr_type || 'METRIC') === 'MILESTONE';
+
+  const toggleMutation = useMutation({
+    mutationFn: () => keyResultService.toggleMilestone(kr.id),
+    onMutate: async () => {
+      const queryKey = ['key-results', kr.objective_id];
+      await queryClient.cancelQueries({ queryKey });
+      const prev = queryClient.getQueryData(queryKey);
+      queryClient.setQueryData(queryKey, (old: any) => {
+        if (!old?.data?.data) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            data: old.data.data.map((k: KeyResult) =>
+              k.id === kr.id
+                ? { ...k, status: k.status === 'DONE' ? 'ON_TRACK' : 'DONE', progress: k.status === 'DONE' ? 0 : 100 }
+                : k
+            ),
+          },
+        };
+      });
+      return { prev };
+    },
+    onError: (err: any, _v, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(['key-results', kr.objective_id], ctx.prev);
+      toast.error(err.response?.data?.message || 'Gagal mengubah milestone');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['key-results'] });
+      queryClient.invalidateQueries({ queryKey: ['objectives'] });
+    },
+  });
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user || user.id !== kr.created_by) {
+      toast.error('Anda tidak punya izin untuk mengubah milestone ini');
+      return;
+    }
+    toggleMutation.mutate();
+  };
+
+  // Compute due date label for milestone
+  const getDueDateLabel = () => {
+    if (!kr.due_date) return { text: 'No due date', color: 'text-gray-500' };
+    if (kr.status === 'DONE') return { text: 'Completed', color: 'text-emerald-700' };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(kr.due_date + 'T00:00:00');
+    const diffMs = due.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return { text: `Overdue ${Math.abs(diffDays)} hari`, color: 'text-red-700' };
+    if (diffDays === 0) return { text: 'Due today', color: 'text-amber-600' };
+    return { text: `Due in ${diffDays} hari`, color: 'text-gray-600' };
+  };
+
   return (
     <div className={`bg-white border border-gray-200 rounded-xl overflow-hidden ${isHighlighted ? 'ring-2 ring-primary ring-offset-1 animate-pulse' : ''}`} data-highlight-kr={isHighlighted || undefined}>
       <div className="p-3 md:p-4 cursor-pointer hover:bg-slate-50/80 transition-colors" onClick={onClick}>
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
-          <div className="min-w-0">
+          <div className="min-w-0 flex items-center gap-2">
+            {isMilestone && (
+              <button
+                type="button"
+                onClick={handleToggle}
+                className="shrink-0 cursor-pointer"
+                title={kr.status === 'DONE' ? 'Mark as not done' : 'Mark as done'}
+              >
+                {kr.status === 'DONE' ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#059669" stroke="#059669" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" stroke="white" /></svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><circle cx="12" cy="12" r="10" /></svg>
+                )}
+              </button>
+            )}
             <h5 className="font-semibold text-sm text-gray-900">{kr.title}</h5>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-semibold text-primary bg-primary/5 px-2 py-1 rounded">{kr.current_value}/{kr.target_value} {kr.metric_unit || ''}</span>
+            {isMilestone ? (
+              <span className="text-xs font-medium px-2 py-1 rounded bg-purple-50 text-purple-700">Milestone</span>
+            ) : (
+              <span className="text-xs font-semibold text-primary bg-primary/5 px-2 py-1 rounded">{kr.current_value}/{kr.target_value} {kr.metric_unit || ''}</span>
+            )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full transition-all duration-500 ${kr.progress >= 100 ? 'bg-emerald-500' : 'bg-primary'}`} style={{ width: `${kr.progress}%` }} />
+
+        {/* METRIC: progress bar */}
+        {!isMilestone && (
+          <>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className={`h-full rounded-full transition-all duration-500 ${kr.progress >= 100 ? 'bg-emerald-500' : 'bg-primary'}`} style={{ width: `${kr.progress}%` }} />
+              </div>
+              <span className="text-[11px] font-bold text-gray-600 w-7 text-right">{kr.progress.toFixed(0)}%</span>
+            </div>
+            {kr.progress === 0 && (
+              <p className="text-[11px] text-amber-600 bg-amber-50 px-2.5 py-1.5 rounded-lg mt-3 flex items-center gap-1.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                Update progress initiative untuk memajukan key result ini
+              </p>
+            )}
+          </>
+        )}
+
+        {/* MILESTONE: due date label */}
+        {isMilestone && (
+          <div className="mt-1">
+            {(() => {
+              const label = getDueDateLabel();
+              return <span className={`text-xs font-medium ${label.color}`}>{label.text}</span>;
+            })()}
           </div>
-          <span className="text-[11px] font-bold text-gray-600 w-7 text-right">{kr.progress.toFixed(0)}%</span>
-        </div>
-        <div className="mt-2"></div>
-        {kr.progress === 0 && (
-          <p className="text-[11px] text-amber-600 bg-amber-50 px-2.5 py-1.5 rounded-lg mt-3 flex items-center gap-1.5">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            Update progress initiative untuk memajukan key result ini
-          </p>
         )}
       </div>
 
@@ -599,52 +717,114 @@ function InitNode({ init, depth, krId, onAddChild, onClick, index = 0, highlight
   const hasChildren = init.children && init.children.length > 0;
   const isLeaf = !hasChildren;
   const daysInfo = init.due_date ? getDaysLeft(init.due_date) : null;
-  const isEven = index % 2 === 0;
   const isHighlighted = highlightedId === init.id;
+  const isDone = init.status === 'DONE';
+  const isCancelled = init.status === 'CANCELLED';
+  const dimmed = isDone || isCancelled;
 
   return (
-    <div className={depth > 0 ? 'ml-3 sm:ml-5 border-l-2 border-gray-200 pl-2 sm:pl-3' : ''}>
-      <div className={`flex items-center py-2.5 px-2 -mx-2 rounded-lg group hover:bg-blue-50/50 transition-colors cursor-pointer ${depth === 0 && !isEven ? 'bg-gray-50/70' : ''} ${isHighlighted ? 'ring-2 ring-primary bg-primary/5 animate-pulse' : ''}`} data-highlight-init={isHighlighted || undefined} onClick={() => onClick(init, krId)}>
-
-        <div className="flex items-center gap-2 shrink-0 min-w-0">
+    <div className={depth > 0 ? 'ml-4 sm:ml-6 border-l-2 border-gray-200 pl-3 sm:pl-4' : ''}>
+      <div
+        className={`flex items-center gap-3 py-3 px-3 -mx-3 rounded-lg group hover:bg-blue-50/40 transition-colors cursor-pointer ${
+          isHighlighted ? 'ring-2 ring-primary bg-primary/5 animate-pulse' : ''
+        }`}
+        data-highlight-init={isHighlighted || undefined}
+        onClick={() => onClick(init, krId)}
+      >
+        {/* Left: expand button + status dot */}
+        <div className="flex items-center gap-2 shrink-0">
           {hasChildren ? (
-            <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 rounded shrink-0">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={`transition-transform ${expanded ? 'rotate-90' : ''}`}><path d="M9 18l6-6-6-6" /></svg>
+            <button
+              onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
+              className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 rounded"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={`transition-transform ${expanded ? 'rotate-90' : ''}`}>
+                <path d="M9 18l6-6-6-6" />
+              </svg>
             </button>
           ) : (
-            <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <div className={`w-2.5 h-2.5 rounded-full ${init.status === 'DONE' ? 'bg-emerald-400' : init.status === 'IN_PROGRESS' ? 'bg-blue-400' : init.status === 'BLOCKED' ? 'bg-red-400' : 'bg-gray-300'}`} />
+            <div className="w-5 h-5 flex items-center justify-center">
+              <div className={`w-2.5 h-2.5 rounded-full ${
+                isDone ? 'bg-emerald-500' :
+                init.status === 'IN_PROGRESS' ? 'bg-blue-500' :
+                init.status === 'BLOCKED' ? 'bg-red-500' :
+                isCancelled ? 'bg-gray-300' :
+                'bg-gray-400'
+              }`} />
             </div>
           )}
-          <span className={`text-sm truncate max-w-[120px] sm:max-w-none ${init.status === 'DONE' ? 'line-through text-gray-400' : 'text-gray-800'}`}>{init.title}</span>
-          <IStatusBadge status={init.status} />
         </div>
 
-        <div className="flex-1 border-b border-dotted border-gray-300 mx-2 min-w-[8px] hidden sm:block" />
+        {/* Center: title (takes remaining space) */}
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <span className={`text-sm font-medium truncate ${
+            isDone ? 'line-through text-gray-400' :
+            isCancelled ? 'line-through text-gray-400' :
+            'text-gray-800'
+          }`}>
+            {init.title}
+          </span>
+          {hasChildren && (
+            <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full font-medium shrink-0">
+              {init.children!.length}
+            </span>
+          )}
+          {!hasChildren && <IStatusBadge status={init.status} />}
+        </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
+        {/* Right: meta info — assignee, due date, progress */}
+        <div className={`flex items-center gap-3 shrink-0 ${dimmed ? 'opacity-60' : ''}`}>
+          {/* Due date */}
+          {daysInfo && isLeaf && !dimmed && (
+            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full hidden md:inline ${daysInfo.color}`}>
+              {daysInfo.label}
+            </span>
+          )}
+
+          {/* Assignee */}
           <span className="hidden sm:block" onClick={(e) => e.stopPropagation()}>
             <InlineAssign initiativeId={init.id} assigneeId={init.assignee_id} />
           </span>
-          {daysInfo && isLeaf && <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full hidden sm:inline ${daysInfo.color}`}>{daysInfo.label}</span>}
-          <div className="flex items-center gap-1 min-w-[45px] sm:min-w-[55px]">
+
+          {/* Progress */}
+          <div className="flex items-center gap-2 min-w-[80px] sm:min-w-[100px]">
             <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full ${init.progress >= 100 ? 'bg-emerald-500' : 'bg-primary'}`} style={{ width: `${init.progress}%` }} />
+              <div
+                className={`h-full rounded-full transition-all ${
+                  init.progress >= 100 ? 'bg-emerald-500' :
+                  init.progress >= 70 ? 'bg-emerald-400' :
+                  'bg-primary'
+                }`}
+                style={{ width: `${init.progress}%` }}
+              />
             </div>
-            <span className="text-[10px] font-semibold text-gray-600 w-7 text-right">{init.progress.toFixed(0)}%</span>
+            <span className="text-xs font-semibold text-gray-700 w-9 text-right tabular-nums">
+              {init.progress.toFixed(0)}%
+            </span>
           </div>
-          <button onClick={(e) => { e.stopPropagation(); onAddChild(krId, init.id); }} className="w-5 h-5 flex items-center justify-center text-gray-300 hover:text-primary hover:bg-primary/5 rounded opacity-0 group-hover:opacity-100 transition-all" title="Sub-initiative">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14" /></svg>
+
+          {/* Add child button */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onAddChild(krId, init.id); }}
+            className="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-primary hover:bg-primary/5 rounded opacity-0 group-hover:opacity-100 transition-all"
+            title="Tambah sub-initiative"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14" /></svg>
           </button>
         </div>
       </div>
 
-
-      {isLeaf && init.status !== 'DONE' && init.status !== 'CANCELLED' && (
+      {isLeaf && !dimmed && (
         <InlineProgress initiative={init} />
       )}
 
-      {expanded && hasChildren && <div>{init.children!.map((c, idx) => <InitNode key={c.id} init={c} depth={depth + 1} krId={krId} onAddChild={onAddChild} onClick={onClick} index={idx} highlightedId={highlightedId} />)}</div>}
+      {expanded && hasChildren && (
+        <div>
+          {init.children!.map((c, idx) => (
+            <InitNode key={c.id} init={c} depth={depth + 1} krId={krId} onAddChild={onAddChild} onClick={onClick} index={idx} highlightedId={highlightedId} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

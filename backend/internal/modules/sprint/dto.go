@@ -43,6 +43,7 @@ type SprintInitiativeResponse struct {
 	KeyResultID    uint    `json:"key_result_id"`
 	SprintID       *uint   `json:"sprint_id"`
 	ParentID       *uint   `json:"parent_id"`
+	ParentTitle    *string `json:"parent_title"`
 	Title          string  `json:"title"`
 	Description    *string `json:"description"`
 	AssigneeID     *uint   `json:"assignee_id"`
@@ -53,6 +54,7 @@ type SprintInitiativeResponse struct {
 	ObjectiveTitle string  `json:"objective_title"`
 	KeyResultTitle string  `json:"key_result_title"`
 	CreatedBy      uint    `json:"created_by"`
+	HasChildren    bool    `json:"has_children"`
 }
 
 // SprintSummaryResponse represents aggregate sprint progress metrics

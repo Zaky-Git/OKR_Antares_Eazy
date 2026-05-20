@@ -18,6 +18,13 @@
 - Tailwind config defines:
   - Primary color: #194FBC (with hover and light variants)
   - Font family: Plus Jakarta Sans as default sans
+
+## Dropdown Rule
+
+- NEVER use native `<select>` elements in forms or panels
+- ALWAYS use the custom `Dropdown` component from `components/atomics/Dropdown.tsx`
+- The custom Dropdown provides consistent styling, keyboard navigation, and proper z-index layering
+- For user/assignee selection, use the `AssigneeSelector` pattern (avatar + name) from InitiativePanel
 - Use Tailwind arbitrary values for specific pixel sizes when needed (e.g. `text-[0.82rem]`)
 - Follow consistent spacing: p-4/p-5 for cards, gap-3/gap-4 between elements
 - Card styles: bg-white border border-gray-200 rounded-xl/rounded-2xl

@@ -9,13 +9,16 @@ import (
 )
 
 type SearchResult struct {
-	Type        string `json:"type"`
-	ID          uint   `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	ParentID    *uint  `json:"parent_id"`
-	ParentTitle string `json:"parent_title"`
-	ObjectiveID *uint  `json:"objective_id"`
+	Type         string  `json:"type"`
+	ID           uint    `json:"id"`
+	Title        string  `json:"title"`
+	Description  string  `json:"description"`
+	ParentID     *uint   `json:"parent_id"`
+	ParentTitle  string  `json:"parent_title"`
+	ObjectiveID  *uint   `json:"objective_id"`
+	StrategyName *string `json:"strategy_name,omitempty"`
+	SegmentName  *string `json:"segment_name,omitempty"`
+	DivisionName *string `json:"division_name,omitempty"`
 }
 
 func (h *Handler) Search(c *gin.Context) {
@@ -39,22 +42,31 @@ func (s *Service) Search(query string) ([]SearchResult, error) {
 	like := "%" + query + "%"
 
 	var objectives []struct {
-		ID    uint
-		Title string
+		ID           uint
+		Title        string
+		StrategyName *string
+		SegmentName  *string
+		DivisionName *string
 	}
-	s.db.Table("objectives").
-		Where("title LIKE ? AND deleted_at IS NULL", like).
-		Select("id, title").
+	s.db.Table("objectives o").
+		Select(`o.id, o.title, st.name AS strategy_name, sg.name AS segment_name, dv.name AS division_name`).
+		Joins("LEFT JOIN strategies st ON st.id = o.strategy_id AND st.deleted_at IS NULL").
+		Joins("LEFT JOIN segments sg ON sg.id = o.segment_id AND sg.deleted_at IS NULL").
+		Joins("LEFT JOIN divisions dv ON dv.id = o.division_id AND dv.deleted_at IS NULL").
+		Where("o.title LIKE ? AND o.deleted_at IS NULL", like).
 		Limit(5).
 		Find(&objectives)
 
 	for _, o := range objectives {
 		oid := o.ID
 		results = append(results, SearchResult{
-			Type:        "objective",
-			ID:          o.ID,
-			Title:       o.Title,
-			ObjectiveID: &oid,
+			Type:         "objective",
+			ID:           o.ID,
+			Title:        o.Title,
+			ObjectiveID:  &oid,
+			StrategyName: o.StrategyName,
+			SegmentName:  o.SegmentName,
+			DivisionName: o.DivisionName,
 		})
 	}
 

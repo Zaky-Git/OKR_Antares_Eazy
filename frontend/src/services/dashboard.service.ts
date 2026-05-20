@@ -18,6 +18,34 @@ export interface ActivityItem {
   created_at: string;
 }
 
+export interface StrategyHealth {
+  id: number;
+  name: string;
+  color: string;
+  total_objectives: number;
+  avg_progress: number;
+  on_track: number;
+  at_risk: number;
+  off_track: number;
+}
+
+export interface DivisionHealth {
+  id: number;
+  name: string;
+  code: string;
+  color: string;
+  total_objectives: number;
+  avg_progress: number;
+  on_track: number;
+  at_risk: number;
+  off_track: number;
+}
+
+export interface ContextHealthResponse {
+  strategies: StrategyHealth[];
+  divisions: DivisionHealth[];
+}
+
 export const dashboardService = {
   get: (periodId: number) =>
     api.get<ApiResponse<DashboardSummary>>(`/dashboard?period_id=${periodId}`),
@@ -27,4 +55,7 @@ export const dashboardService = {
 
   getLogs: (page = 1, limit = 20) =>
     api.get<ApiResponse<ActivityItem[]>>(`/logs?page=${page}&limit=${limit}`),
+
+  getContextHealth: (periodId: number) =>
+    api.get<ApiResponse<ContextHealthResponse>>(`/dashboard/context-health?period_id=${periodId}`),
 };

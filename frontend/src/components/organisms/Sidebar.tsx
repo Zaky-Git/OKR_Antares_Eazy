@@ -38,13 +38,17 @@ export function Sidebar({ open, onClose }: Props) {
           </div>
           <div className="mb-5">
             <p className="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Management</p>
-            <NavItem to="/objectives" icon={<ObjectiveIcon />} label="Objectives" onClick={onClose} />
             <NavItem to="/sprints" icon={<SprintIcon />} label="Sprints" onClick={onClose} />
+            <NavItem to="/objectives" icon={<ObjectiveIcon />} label="Objectives" onClick={onClose} />
           </div>
           <div className="mb-5">
             <p className="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Workspace</p>
             <NavItem to="/logs" icon={<LogIcon />} label="Activity Log" onClick={onClose} />
             <NavItem to="/notifications" icon={<NotifIcon />} label="Notifications" onClick={onClose} />
+          </div>
+          <div className="mb-5">
+            <p className="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Settings</p>
+            <NavItem to="/admin/masters" icon={<MasterIcon />} label="Master Data" onClick={onClose} />
           </div>
         </nav>
 
@@ -82,3 +86,4 @@ function ObjectiveIcon() { return <svg width="18" height="18" viewBox="0 0 24 24
 function SprintIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" /></svg>; }
 function LogIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 20V10M18 20V4M6 20v-4" strokeLinecap="round" /></svg>; }
 function NotifIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" /></svg>; }
+function MasterIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 7h18M3 12h18M3 17h18" strokeLinecap="round" /></svg>; }
