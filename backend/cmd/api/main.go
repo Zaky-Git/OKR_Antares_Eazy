@@ -7,6 +7,7 @@ import (
 	"github.com/antares-eazy/okr-backend/internal/config"
 	"github.com/antares-eazy/okr-backend/internal/database"
 	"github.com/antares-eazy/okr-backend/internal/middleware"
+	"github.com/antares-eazy/okr-backend/internal/modules/period"
 	"github.com/antares-eazy/okr-backend/internal/routes"
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +21,11 @@ func main() {
 
 
 	database.Migrate()
+
+	periodRepo := period.NewRepository(database.GetDB())
+	periodService := period.NewService(periodRepo)
+	periodService.EnsureCurrentYear()
+	log.Println("Periods ensured for current year")
 
 
 	r := gin.Default()
