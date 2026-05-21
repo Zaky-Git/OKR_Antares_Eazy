@@ -152,7 +152,7 @@ export function TopBar({ title, onMenuClick }: Props) {
         return (
           <>
             <span className="text-primary/30 hidden sm:inline">•</span>
-            <span className={`${cls} hidden sm:inline`}>{label}</span>
+            <span className={`${cls} hidden sm:inline`}>{label} left</span>
           </>
         );
       })()}

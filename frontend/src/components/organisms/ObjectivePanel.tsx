@@ -8,6 +8,7 @@ import { Strategy, Segment, Division } from '../../types/master';
 import toast from 'react-hot-toast';
 import { useEffect, useState, useRef } from 'react';
 import Dropdown from '../atomics/Dropdown';
+import { ConfirmDialog } from '../atomics';
 
 interface Props {
   objective?: Objective | null;
@@ -31,6 +32,7 @@ const NOTES_MAX = 5000;
 export function ObjectivePanel({ objective, periodId, onClose }: Props) {
   const queryClient = useQueryClient();
   const isEdit = !!objective;
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isDirty } } = useForm<FormData>({
     defaultValues: getDefaults(objective),
@@ -259,7 +261,7 @@ export function ObjectivePanel({ objective, periodId, onClose }: Props) {
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           {isEdit ? (
-            <button type="button" onClick={() => { if (confirm('Hapus objective ini beserta semua Key Results dan Initiatives?')) deleteMutation.mutate(); }} className="text-xs text-red-500 hover:text-red-700 font-medium">
+            <button type="button" onClick={() => setConfirmDelete(true)} className="text-xs text-red-500 hover:text-red-700 font-medium">
               Hapus Objective
             </button>
           ) : <span />}
@@ -273,6 +275,15 @@ export function ObjectivePanel({ objective, periodId, onClose }: Props) {
           </button>
         </div>
       </form>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Hapus Objective?"
+        message="Objective ini beserta semua Key Results dan Initiatives di dalamnya akan dihapus permanen."
+        confirmLabel="Hapus"
+        onConfirm={() => { setConfirmDelete(false); deleteMutation.mutate(); }}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

@@ -39,11 +39,15 @@ export function Sidebar({ open, onClose }: Props) {
 
       <aside className={`w-[220px] h-screen fixed left-0 top-0 bg-white border-r border-gray-100 flex flex-col z-50 transition-transform duration-200 ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
 
-        <div className="px-5 py-5 border-b border-gray-100">
-          <div className="flex items-center gap-1">
-            <span className="text-primary font-extrabold text-sm">eazy</span>
-            <span className="font-bold text-sm text-gray-800">OKR</span>
-            <span className="text-xs text-gray-400 ml-1">Antares Eazy</span>
+        <div className="px-5 py-4 border-b border-gray-100">
+          <div className="flex items-center gap-1.5">
+            {/* eazy OKR logo — SVG inline for crisp rendering */}
+            <svg width="80" height="22" viewBox="0 0 80 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* "eazy" in primary blue */}
+              <text x="0" y="17" fontFamily="'Plus Jakarta Sans', sans-serif" fontWeight="800" fontSize="15" fill="#194FBC">eazy</text>
+              {/* "OKR" in dark */}
+              <text x="38" y="17" fontFamily="'Plus Jakarta Sans', sans-serif" fontWeight="700" fontSize="15" fill="#1F2937">OKR</text>
+            </svg>
           </div>
         </div>
 
@@ -62,6 +66,10 @@ export function Sidebar({ open, onClose }: Props) {
             <p className="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Workspace</p>
             <NavItem to="/logs" icon={<LogIcon />} label="Activity Log" onClick={onClose} />
             <NavItem to="/notifications" icon={<NotifIcon />} label="Notifications" onClick={onClose} />
+          </div>
+          <div className="mb-5">
+            <p className="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Settings</p>
+            <NavItem to="/admin/masters" icon={<MasterDataIcon />} label="Master Data" onClick={onClose} />
           </div>
         </nav>
 
@@ -148,3 +156,4 @@ function ObjectiveIcon() { return <svg width="18" height="18" viewBox="0 0 24 24
 function SprintIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" /></svg>; }
 function LogIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 20V10M18 20V4M6 20v-4" strokeLinecap="round" /></svg>; }
 function NotifIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" /></svg>; }
+function MasterDataIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" strokeLinecap="round" /></svg>; }

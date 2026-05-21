@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { keyResultService } from '../../services/keyResult.service';
 import { KeyResult } from '../../types';
 import toast from 'react-hot-toast';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ConfirmDialog } from '../atomics';
 
 interface Props {
   keyResult?: KeyResult | null;
@@ -27,6 +28,7 @@ interface FormData {
 export function KeyResultPanel({ keyResult, objectiveId, onClose }: Props) {
   const queryClient = useQueryClient();
   const isEdit = !!keyResult;
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormData>({
     defaultValues: {
@@ -200,13 +202,22 @@ export function KeyResultPanel({ keyResult, objectiveId, onClose }: Props) {
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           {isEdit ? (
-            <button type="button" onClick={() => { if (confirm('Hapus key result ini?')) deleteMutation.mutate(); }} className="text-xs text-red-500 hover:text-red-700 font-medium">Hapus</button>
+            <button type="button" onClick={() => setConfirmDelete(true)} className="text-xs text-red-500 hover:text-red-700 font-medium">Hapus</button>
           ) : <span />}
           <button type="submit" disabled={saveMutation.isPending || notesExceeded} className="px-5 py-2.5 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover disabled:opacity-50 transition-colors">
             {saveMutation.isPending ? '...' : isEdit ? 'Perbarui' : 'Buat Key Result'}
           </button>
         </div>
       </form>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Hapus Key Result?"
+        message="Key result ini beserta semua initiatives di dalamnya akan dihapus permanen."
+        confirmLabel="Hapus"
+        onConfirm={() => { setConfirmDelete(false); deleteMutation.mutate(); }}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

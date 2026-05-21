@@ -9,6 +9,7 @@ import {
   Spinner,
   ColorSwatch,
   ColorPicker,
+  ConfirmDialog,
 } from '../components/atomics';
 import { strategiesApi, segmentsApi, divisionsApi } from '../services/master.service';
 import type {
@@ -88,6 +89,7 @@ function StrategyTab() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   // Reset to page 1 when search changes
   useEffect(() => { setPage(1); }, [debouncedSearch]);
@@ -134,17 +136,22 @@ function StrategyTab() {
           item.is_active ? <ActiveBadge /> : <InactiveBadge />,
         ]}
         onEdit={(it) => { setEditing(it); setShowForm(true); }}
-        onDelete={(id) => {
-          if (confirm('Hapus strategy ini? Objective yang merujuk akan di-clear.')) {
-            removeMut.mutate(id);
-          }
-        }}
+        onDelete={(id) => setDeleteTarget(id)}
         emptyMessage={debouncedSearch ? 'Tidak ada strategy yang cocok dengan pencarian.' : 'Belum ada strategy.'}
       />
 
       {meta && meta.total > 0 && (
         <Pagination meta={meta} onChange={setPage} />
       )}
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Hapus Strategy?"
+        message="Objective yang menggunakan strategy ini akan di-clear. Tindakan ini tidak dapat dibatalkan."
+        confirmLabel="Hapus"
+        onConfirm={() => { const id = deleteTarget!; setDeleteTarget(null); removeMut.mutate(id); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {showForm && (
         <StrategyFormModal
@@ -227,6 +234,7 @@ function SegmentTab() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   useEffect(() => { setPage(1); }, [debouncedSearch]);
 
@@ -271,17 +279,22 @@ function SegmentTab() {
           item.is_active ? <ActiveBadge /> : <InactiveBadge />,
         ]}
         onEdit={(it) => { setEditing(it); setShowForm(true); }}
-        onDelete={(id) => {
-          if (confirm('Hapus segment ini? Objective yang merujuk akan di-clear.')) {
-            removeMut.mutate(id);
-          }
-        }}
+        onDelete={(id) => setDeleteTarget(id)}
         emptyMessage={debouncedSearch ? 'Tidak ada segment yang cocok dengan pencarian.' : 'Belum ada segment.'}
       />
 
       {meta && meta.total > 0 && (
         <Pagination meta={meta} onChange={setPage} />
       )}
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Hapus Segment?"
+        message="Objective yang menggunakan segment ini akan di-clear. Tindakan ini tidak dapat dibatalkan."
+        confirmLabel="Hapus"
+        onConfirm={() => { const id = deleteTarget!; setDeleteTarget(null); removeMut.mutate(id); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {showForm && (
         <SegmentFormModal
@@ -361,6 +374,7 @@ function DivisionTab() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   useEffect(() => { setPage(1); }, [debouncedSearch]);
 
@@ -406,17 +420,22 @@ function DivisionTab() {
           item.is_active ? <ActiveBadge /> : <InactiveBadge />,
         ]}
         onEdit={(it) => { setEditing(it); setShowForm(true); }}
-        onDelete={(id) => {
-          if (confirm('Hapus divisi ini? Objective yang merujuk akan di-clear.')) {
-            removeMut.mutate(id);
-          }
-        }}
+        onDelete={(id) => setDeleteTarget(id)}
         emptyMessage={debouncedSearch ? 'Tidak ada divisi yang cocok dengan pencarian.' : 'Belum ada divisi.'}
       />
 
       {meta && meta.total > 0 && (
         <Pagination meta={meta} onChange={setPage} />
       )}
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Hapus Divisi?"
+        message="Objective yang menggunakan divisi ini akan di-clear. Tindakan ini tidak dapat dibatalkan."
+        confirmLabel="Hapus"
+        onConfirm={() => { const id = deleteTarget!; setDeleteTarget(null); removeMut.mutate(id); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {showForm && (
         <DivisionFormModal

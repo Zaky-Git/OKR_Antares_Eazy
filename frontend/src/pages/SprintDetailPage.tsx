@@ -10,6 +10,7 @@ import CompleteSprintModal from '../components/organisms/CompleteSprintModal';
 import { DetailPanel } from '../components/organisms/DetailPanel';
 import { InitiativePanel } from '../components/organisms/InitiativePanel';
 import { SprintPanel } from '../components/organisms/SprintPanel';
+import { ConfirmDialog } from '../components/atomics';
 import { SprintInitiative, Initiative } from '../types';
 import toast from 'react-hot-toast';
 
@@ -22,6 +23,7 @@ export function SprintDetailPage() {
   const [selectedInitiative, setSelectedInitiative] = useState<SprintInitiative | null>(null);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showEditDrawer, setShowEditDrawer] = useState(false);
+  const [confirmDeleteSprint, setConfirmDeleteSprint] = useState(false);
 
   const { data: sprintRes, isLoading, isError } = useQuery({
     queryKey: ['sprint', sprintId],
@@ -239,9 +241,7 @@ export function SprintDetailPage() {
                     Edit
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm(`Hapus sprint "${sprint.name}"?`)) deleteMutation.mutate();
-                    }}
+                    onClick={() => setConfirmDeleteSprint(true)}
                     disabled={deleteMutation.isPending}
                     className="px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     title="Hapus sprint"
@@ -335,6 +335,15 @@ export function SprintDetailPage() {
           sprintName={sprint.name}
         />
       )}
+
+      <ConfirmDialog
+        open={confirmDeleteSprint}
+        title={`Hapus "${sprint.name}"?`}
+        message="Sprint ini akan dihapus permanen. Initiatives yang ada di sprint ini tidak akan ikut terhapus."
+        confirmLabel="Hapus Sprint"
+        onConfirm={() => { setConfirmDeleteSprint(false); deleteMutation.mutate(); }}
+        onCancel={() => setConfirmDeleteSprint(false)}
+      />
 
       {/* Edit Sprint Drawer */}
       <DetailPanel open={showEditDrawer} onClose={() => setShowEditDrawer(false)} title="Detail Sprint">

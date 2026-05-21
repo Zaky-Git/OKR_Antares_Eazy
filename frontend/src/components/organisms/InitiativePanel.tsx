@@ -8,6 +8,7 @@ import { Initiative, User } from '../../types';
 import toast from 'react-hot-toast';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import Dropdown from '../atomics/Dropdown';
+import { ConfirmDialog } from '../atomics';
 
 interface Props {
   initiative?: Initiative | null;
@@ -41,6 +42,7 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
   const isEdit = !!initiative;
   const hasChildren = initiative?.children && initiative.children.length > 0;
   const isLeaf = isEdit && !hasChildren;
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isDirty } } = useForm<FormData>({
     defaultValues: getDefaults(initiative),
@@ -280,7 +282,7 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           {isEdit ? (
-            <button type="button" onClick={() => { if (confirm('Hapus initiative ini?')) deleteMutation.mutate(); }} className="text-xs text-red-500 hover:text-red-700 font-medium">Hapus</button>
+            <button type="button" onClick={() => setConfirmDelete(true)} className="text-xs text-red-500 hover:text-red-700 font-medium">Hapus</button>
           ) : <span />}
           <button type="submit" disabled={saveMutation.isPending || (isEdit && !hasChanges)}
             className={`px-5 py-2.5 text-sm font-semibold rounded-lg transition-colors ${
@@ -346,6 +348,15 @@ export function InitiativePanel({ initiative, keyResultId, parentId, onClose, on
           <ChildList parentId={initiative!.id} keyResultId={keyResultId} onOpenChild={onOpenChild} />
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Hapus Initiative?"
+        message="Initiative ini beserta semua sub-initiatives di dalamnya akan dihapus permanen."
+        confirmLabel="Hapus"
+        onConfirm={() => { setConfirmDelete(false); deleteMutation.mutate(); }}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

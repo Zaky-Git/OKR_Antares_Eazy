@@ -10,3 +10,4 @@ export { YearPicker } from './YearPicker';
 export { default as Dropdown } from './Dropdown';
 export { ColorSwatch } from './ColorSwatch';
 export { ColorPicker } from './ColorPicker';
+export { ConfirmDialog } from './ConfirmDialog';

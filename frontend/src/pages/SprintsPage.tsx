@@ -3,7 +3,7 @@ import { sprintService } from '../services/sprint.service';
 import { periodService } from '../services/period.service';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
-import { YearPicker } from '../components/atomics';
+import { YearPicker, ConfirmDialog } from '../components/atomics';
 import { Sprint, SprintSummary as SprintSummaryT } from '../types';
 import { DetailPanel } from '../components/organisms/DetailPanel';
 import { SprintPanel } from '../components/organisms/SprintPanel';
@@ -31,6 +31,7 @@ export function SprintsPage() {
   const [panel, setPanel] = useState<PanelState>({ type: 'none' });
   const [completeSprint, setCompleteSprint] = useState<Sprint | null>(null);
   const [highlightedSprintId, setHighlightedSprintId] = useState<number | null>(null);
+  const [deleteSprintTarget, setDeleteSprintTarget] = useState<Sprint | null>(null);
 
   useEffect(() => {
     const handler = () => setSelectedPeriodId(null);
@@ -285,9 +286,7 @@ export function SprintsPage() {
               onEdit={() => setPanel({ type: 'edit', sprint })}
               onActivate={() => activateMutation.mutate(sprint.id)}
               onComplete={() => setCompleteSprint(sprint)}
-              onDelete={() => {
-                if (confirm(`Hapus sprint "${sprint.name}"?`)) deleteMutation.mutate(sprint.id);
-              }}
+              onDelete={() => setDeleteSprintTarget(sprint)}
               isActivating={activateMutation.isPending && activateMutation.variables === sprint.id}
               isDeleting={deleteMutation.isPending && deleteMutation.variables === sprint.id}
             />
@@ -318,6 +317,15 @@ export function SprintsPage() {
           sprintName={completeSprint.name}
         />
       )}
+
+      <ConfirmDialog
+        open={!!deleteSprintTarget}
+        title={`Hapus "${deleteSprintTarget?.name}"?`}
+        message="Sprint ini akan dihapus permanen. Initiatives yang ada di sprint ini tidak akan ikut terhapus."
+        confirmLabel="Hapus Sprint"
+        onConfirm={() => { const id = deleteSprintTarget!.id; setDeleteSprintTarget(null); deleteMutation.mutate(id); }}
+        onCancel={() => setDeleteSprintTarget(null)}
+      />
     </div>
   );
 }
