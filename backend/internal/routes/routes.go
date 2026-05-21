@@ -85,6 +85,7 @@ func Setup(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 		protected.GET("/auth/me", authHandler.Me)
 		protected.GET("/users", authHandler.GetAllUsers)
+		protected.PATCH("/auth/profile", authHandler.UpdateProfile)
 
 
 		protected.GET("/periods", periodHandler.GetAll)

@@ -6,6 +6,7 @@ interface AuthStore {
   token: string | null;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateUser: (user: User) => void;
   isAuthenticated: () => boolean;
 }
 
@@ -23,6 +24,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     set({ token: null, user: null });
+  },
+
+  updateUser: (user: User) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user });
   },
 
   isAuthenticated: () => !!get().token,

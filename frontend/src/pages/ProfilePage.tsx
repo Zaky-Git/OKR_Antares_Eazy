@@ -25,9 +25,9 @@ export function ProfilePage() {
       await authService.updateProfile({ name: data.name });
       const updatedUser = { ...user!, name: data.name };
       updateUser(updatedUser);
+      reset({ name: data.name });
       toast.success('Nama berhasil diperbarui');
       setEditing(false);
-      window.location.reload();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Gagal memperbarui profil');
     }

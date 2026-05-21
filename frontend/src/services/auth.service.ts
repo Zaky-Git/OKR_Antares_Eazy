@@ -16,4 +16,7 @@ export const authService = {
   getMe: () => api.get<ApiResponse<User>>('/auth/me'),
 
   getUsers: () => api.get<ApiResponse<User[]>>('/users'),
+
+  updateProfile: (data: { name: string }) =>
+    api.patch<ApiResponse<User>>('/auth/profile', data),
 };
