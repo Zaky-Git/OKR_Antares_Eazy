@@ -15,12 +15,12 @@ const LIMIT = 20;
 
 function getTypeIcon(type: string) {
   switch (type) {
-    case 'DUE_TODAY': return { bg: 'bg-red-100',    text: 'text-red-600',    icon: '🔴' };
-    case 'DUE_H1':   return { bg: 'bg-orange-100',  text: 'text-orange-600', icon: '🟠' };
-    case 'DUE_H3':   return { bg: 'bg-yellow-100',  text: 'text-yellow-600', icon: '🟡' };
-    case 'OVERDUE':  return { bg: 'bg-red-100',     text: 'text-red-700',    icon: '⚠️' };
-    case 'ASSIGN':   return { bg: 'bg-blue-100',    text: 'text-blue-600',   icon: '👤' };
-    default:         return { bg: 'bg-gray-100',    text: 'text-gray-600',   icon: '🔔' };
+    case 'DUE_TODAY': return { bg: 'bg-red-100',   text: 'text-red-600',    icon: '🔴' };
+    case 'DUE_H1':   return { bg: 'bg-orange-100', text: 'text-orange-600', icon: '🟠' };
+    case 'DUE_H3':   return { bg: 'bg-yellow-100', text: 'text-yellow-600', icon: '🟡' };
+    case 'OVERDUE':  return { bg: 'bg-red-100',    text: 'text-red-700',    icon: '⚠️' };
+    case 'ASSIGN':   return { bg: 'bg-blue-100',   text: 'text-blue-600',   icon: '👤' };
+    default:         return { bg: 'bg-gray-100',   text: 'text-gray-600',   icon: '🔔' };
   }
 }
 
@@ -140,7 +140,6 @@ function ObjectivesSection({ periodId }: { periodId: number | undefined }) {
         count={objectives.length}
         onViewAll={() => navigate('/objectives')}
       />
-
       {isLoading ? (
         <div className="flex justify-center py-6">
           <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -160,7 +159,6 @@ function ObjectivesSection({ periodId }: { periodId: number | undefined }) {
               onClick={() => navigate(`/objectives?highlightObj=${obj.id}`)}
               className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all group"
             >
-              {/* Progress ring */}
               <div className="relative w-9 h-9 shrink-0">
                 <svg viewBox="0 0 36 36" className="w-9 h-9 -rotate-90">
                   <circle cx="18" cy="18" r="15" fill="none" stroke="#E5E7EB" strokeWidth="3" />
@@ -176,7 +174,6 @@ function ObjectivesSection({ periodId }: { periodId: number | undefined }) {
                   {obj.progress.toFixed(0)}%
                 </span>
               </div>
-
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-800 truncate group-hover:text-primary transition-colors">
                   {obj.title}
@@ -185,7 +182,6 @@ function ObjectivesSection({ periodId }: { periodId: number | undefined }) {
                   <ObjStatusBadge status={obj.status} />
                 </div>
               </div>
-
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300 group-hover:text-primary shrink-0 transition-colors">
                 <path d="M9 18l6-6-6-6" />
               </svg>
@@ -217,7 +213,6 @@ function SprintsSection({ periodId }: { periodId: number | undefined }) {
         count={sprints.length}
         onViewAll={() => navigate('/sprints')}
       />
-
       {isLoading ? (
         <div className="flex justify-center py-6">
           <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -231,7 +226,6 @@ function SprintsSection({ periodId }: { periodId: number | undefined }) {
         </div>
       ) : (
         <div className="space-y-2">
-          {/* Active sprint pinned at top with highlight */}
           {activeSprint && (
             <button
               onClick={() => navigate(`/sprints/${activeSprint.id}`)}
@@ -243,47 +237,33 @@ function SprintsSection({ periodId }: { periodId: number | undefined }) {
                   <p className="text-sm font-bold text-gray-900 truncate">{activeSprint.name}</p>
                   <SprintStatusBadge status={activeSprint.status} />
                 </div>
-                <p className="text-xs text-gray-500">
-                  {formatDate(activeSprint.start_date)} — {formatDate(activeSprint.end_date)}
-                </p>
-                {activeSprint.goal && (
-                  <p className="text-xs text-gray-600 mt-0.5 truncate">{activeSprint.goal}</p>
-                )}
+                <p className="text-xs text-gray-500">{formatDate(activeSprint.start_date)} — {formatDate(activeSprint.end_date)}</p>
+                {activeSprint.goal && <p className="text-xs text-gray-600 mt-0.5 truncate">{activeSprint.goal}</p>}
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300 group-hover:text-primary shrink-0 transition-colors">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </button>
           )}
-
-          {/* Other sprints */}
-          {sprints
-            .filter((s) => s.id !== activeSprint?.id)
-            .map((sprint) => (
-              <button
-                key={sprint.id}
-                onClick={() => navigate(`/sprints/${sprint.id}`)}
-                className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all group"
-              >
-                <div className={`w-2 h-2 rounded-full shrink-0 ${
-                  sprint.status === 'COMPLETED' ? 'bg-blue-400' : 'bg-gray-300'
-                }`} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <p className="text-sm font-semibold text-gray-700 truncate group-hover:text-primary transition-colors">
-                      {sprint.name}
-                    </p>
-                    <SprintStatusBadge status={sprint.status} />
-                  </div>
-                  <p className="text-xs text-gray-400">
-                    {formatDate(sprint.start_date)} — {formatDate(sprint.end_date)}
-                  </p>
+          {sprints.filter((s) => s.id !== activeSprint?.id).map((sprint) => (
+            <button
+              key={sprint.id}
+              onClick={() => navigate(`/sprints/${sprint.id}`)}
+              className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all group"
+            >
+              <div className={`w-2 h-2 rounded-full shrink-0 ${sprint.status === 'COMPLETED' ? 'bg-blue-400' : 'bg-gray-300'}`} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-sm font-semibold text-gray-700 truncate group-hover:text-primary transition-colors">{sprint.name}</p>
+                  <SprintStatusBadge status={sprint.status} />
                 </div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300 group-hover:text-primary shrink-0 transition-colors">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
-              </button>
-            ))}
+                <p className="text-xs text-gray-400">{formatDate(sprint.start_date)} — {formatDate(sprint.end_date)}</p>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300 group-hover:text-primary shrink-0 transition-colors">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          ))}
         </div>
       )}
     </div>
@@ -295,11 +275,9 @@ function SprintsSection({ periodId }: { periodId: number | undefined }) {
 export function NotificationsPage() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
-  const [activeTab, setActiveTab] = useState<'notifications' | 'overview'>('overview');
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // Current period for objectives + sprints sections
   const { data: currentPeriodRes } = useQuery({
     queryKey: ['periods', 'current'],
     queryFn: () => periodService.getCurrent(),
@@ -329,13 +307,15 @@ export function NotificationsPage() {
     },
   });
 
-  const checkDueMutation = useMutation({
+  const refreshMutation = useMutation({
     mutationFn: () => notificationService.checkDue(),
     onSuccess: (res) => {
       const count = res.data.data?.created ?? 0;
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
-      toast.success(count > 0 ? `${count} notifikasi baru ditemukan` : 'Tidak ada notifikasi baru');
+      queryClient.invalidateQueries({ queryKey: ['objectives-notif'] });
+      queryClient.invalidateQueries({ queryKey: ['sprints-notif'] });
+      toast.success(count > 0 ? `${count} notifikasi baru ditemukan` : 'Semua data diperbarui');
     },
   });
 
@@ -353,25 +333,23 @@ export function NotificationsPage() {
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       {/* Page header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Notifikasi</h1>
           {currentPeriod && (
-            <p className="text-sm text-gray-400 mt-0.5">
-              {currentPeriod.quarter} {currentPeriod.year}
-            </p>
+            <p className="text-sm text-gray-400 mt-0.5">{currentPeriod.quarter} {currentPeriod.year}</p>
           )}
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => checkDueMutation.mutate()}
-            disabled={checkDueMutation.isPending}
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshMutation.isPending}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={refreshMutation.isPending ? 'animate-spin' : ''}>
               <path d="M23 4v6h-6M1 20v-6h6" /><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
             </svg>
-            {checkDueMutation.isPending ? 'Memeriksa...' : 'Cek Deadline'}
+            {refreshMutation.isPending ? 'Memperbarui...' : 'Refresh'}
           </button>
           {unreadCount > 0 && (
             <button
@@ -388,132 +366,104 @@ export function NotificationsPage() {
         </div>
       </div>
 
-      {/* Tab switcher */}
-      <div className="flex gap-1 mb-5 bg-gray-100 rounded-xl p-1">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${
-            activeTab === 'overview' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Overview
-        </button>
-        <button
-          onClick={() => setActiveTab('notifications')}
-          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
-            activeTab === 'notifications' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Notifikasi
-          {unreadCount > 0 && (
-            <span className="bg-primary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-              {unreadCount}
-            </span>
-          )}
-        </button>
-      </div>
+      {/* Objectives + Sprints sections */}
+      <ObjectivesSection periodId={currentPeriodId} />
+      <SprintsSection periodId={currentPeriodId} />
 
-      {/* ── Overview tab ── */}
-      {activeTab === 'overview' && (
-        <>
-          <ObjectivesSection periodId={currentPeriodId} />
-          <SprintsSection periodId={currentPeriodId} />
-        </>
-      )}
-
-      {/* ── Notifications tab ── */}
-      {activeTab === 'notifications' && (
-        <>
-          {/* Unread/All filter */}
-          <div className="flex gap-1 mb-4 bg-gray-100 rounded-xl p-1 w-fit">
+      {/* Notifications list — only shown when there are notifications */}
+      {(isLoading || displayed.length > 0) && (
+      <div className="bg-white border border-gray-200 rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#194FBC" strokeWidth="2">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <h2 className="text-sm font-bold text-gray-800">Notifikasi</h2>
+            {unreadCount > 0 && (
+              <span className="text-[10px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full">{unreadCount}</span>
+            )}
+          </div>
+          {/* All / Unread filter */}
+          <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
             {(['all', 'unread'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => { setFilter(f); setPage(1); }}
-                className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`px-3 py-1 text-[11px] font-semibold rounded-md transition-colors ${
                   filter === f ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {f === 'all' ? `Semua${meta?.total ? ` (${meta.total})` : ''}` : `Belum Dibaca${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+                {f === 'all' ? 'Semua' : 'Belum Dibaca'}
               </button>
             ))}
           </div>
+        </div>
 
-          <div className="space-y-2">
-            {isLoading ? (
-              <div className="flex justify-center py-16">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : displayed.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-3 text-2xl">🔔</div>
-                <p className="text-sm font-semibold text-gray-700">
-                  {filter === 'unread' ? 'Tidak ada notifikasi yang belum dibaca' : 'Belum ada notifikasi'}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Notifikasi muncul saat ada tugas yang diberikan atau mendekati deadline
-                </p>
-              </div>
-            ) : (
-              displayed.map((notif) => {
-                const style = getTypeIcon(notif.type);
-                return (
-                  <button
-                    key={notif.id}
-                    onClick={() => handleClick(notif)}
-                    className={`w-full text-left flex items-start gap-3 px-4 py-3.5 rounded-xl border transition-all hover:shadow-sm ${
-                      notif.is_read
-                        ? 'bg-white border-gray-100 hover:border-gray-200'
-                        : 'bg-blue-50/60 border-blue-100 hover:border-blue-200'
-                    }`}
-                  >
-                    <div className={`w-9 h-9 rounded-full ${style.bg} flex items-center justify-center shrink-0 text-base mt-0.5`}>
-                      {style.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <span className={`inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md mb-1 ${style.bg} ${style.text}`}>
-                            {getTypeLabel(notif.type)}
-                          </span>
-                          <p className={`text-sm leading-snug ${notif.is_read ? 'text-gray-700 font-normal' : 'text-gray-900 font-semibold'}`}>
-                            {notif.title}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{notif.message}</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1.5 shrink-0">
-                          <span className="text-[11px] text-gray-400 whitespace-nowrap">{relativeTime(notif.created_at)}</span>
-                          {!notif.is_read && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
-                        </div>
+        <div className="space-y-2">
+          {isLoading ? (
+            <div className="flex justify-center py-10">
+              <div className="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            displayed.map((notif) => {
+              const style = getTypeIcon(notif.type);
+              return (
+                <button
+                  key={notif.id}
+                  onClick={() => handleClick(notif)}
+                  className={`w-full text-left flex items-start gap-3 px-4 py-3.5 rounded-xl border transition-all hover:shadow-sm ${
+                    notif.is_read
+                      ? 'bg-white border-gray-100 hover:border-gray-200'
+                      : 'bg-blue-50/60 border-blue-100 hover:border-blue-200'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-full ${style.bg} flex items-center justify-center shrink-0 text-base mt-0.5`}>
+                    {style.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <span className={`inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md mb-1 ${style.bg} ${style.text}`}>
+                          {getTypeLabel(notif.type)}
+                        </span>
+                        <p className={`text-sm leading-snug ${notif.is_read ? 'text-gray-700 font-normal' : 'text-gray-900 font-semibold'}`}>
+                          {notif.title}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{notif.message}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        <span className="text-[11px] text-gray-400 whitespace-nowrap">{relativeTime(notif.created_at)}</span>
+                        {!notif.is_read && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
                       </div>
                     </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && filter === 'all' && (
-            <div className="flex items-center justify-center gap-2 mt-6">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                ← Sebelumnya
-              </button>
-              <span className="text-xs text-gray-500">{page} / {totalPages}</span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Berikutnya →
-              </button>
-            </div>
+                  </div>
+                </button>
+              );
+            })
           )}
-        </>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && filter === 'all' && (
+          <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-100">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              ← Sebelumnya
+            </button>
+            <span className="text-xs text-gray-500">{page} / {totalPages}</span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Berikutnya →
+            </button>
+          </div>
+        )}
+      </div>
       )}
     </div>
   );
