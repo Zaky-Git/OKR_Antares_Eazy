@@ -198,9 +198,6 @@ func (s *Service) Update(id uint, req UpdateRequest, userID uint) (*UpdateResult
 		}
 		return nil, nil, err
 	}
-	if plain.CreatedBy != userID {
-		return nil, nil, ErrForbidden
-	}
 
 	// Snapshot copy
 	pre := *plain
@@ -274,16 +271,12 @@ func (s *Service) Update(id uint, req UpdateRequest, userID uint) (*UpdateResult
 }
 
 func (s *Service) Delete(id uint, userID uint) error {
-	obj, err := s.repo.FindByIDPlain(id)
+	_, err := s.repo.FindByIDPlain(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrNotFound
 		}
 		return err
-	}
-
-	if obj.CreatedBy != userID {
-		return ErrForbidden
 	}
 
 	return s.repo.SoftDelete(id)

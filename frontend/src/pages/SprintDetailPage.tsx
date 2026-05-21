@@ -24,7 +24,7 @@ export function SprintDetailPage() {
   const [showEditDrawer, setShowEditDrawer] = useState(false);
 
   const { data: sprintRes, isLoading, isError } = useQuery({
-    queryKey: ['sprints', sprintId],
+    queryKey: ['sprint', sprintId],
     queryFn: () => sprintService.getById(sprintId),
     enabled: !!sprintId,
   });
@@ -49,6 +49,7 @@ export function SprintDetailPage() {
     mutationFn: () => sprintService.activate(sprintId),
     onSuccess: () => {
       toast.success('Sprint berhasil diaktifkan');
+      queryClient.invalidateQueries({ queryKey: ['sprint', sprintId] });
       queryClient.invalidateQueries({ queryKey: ['sprints'] });
     },
     onError: (err: any) => toast.error(err?.response?.data?.message || 'Gagal mengaktifkan sprint'),
@@ -380,17 +381,22 @@ function SprintStatusBadge({ status }: { status: string }) {
   );
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return '—';
+  // Ensure we parse as local date (not UTC) by appending T00:00:00
+  const d = new Date(dateStr.slice(0, 10) + 'T00:00:00');
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function SprintTimelineInfo({ startDate, endDate, status }: { startDate: string; endDate: string; status: string }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const start = new Date(startDate);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(endDate);
-  end.setHours(0, 0, 0, 0);
+  // Parse as local date to avoid timezone offset issues
+  const start = new Date((startDate || '').slice(0, 10) + 'T00:00:00');
+  const end = new Date((endDate || '').slice(0, 10) + 'T00:00:00');
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return null;
 
   const totalDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
   const elapsed = Math.round((today.getTime() - start.getTime()) / 86400000) + 1;

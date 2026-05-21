@@ -24,11 +24,20 @@ export function SprintPanel({ sprint, periodId, period, onClose }: Props) {
   const isEdit = !!sprint;
   const isCompleted = sprint?.status === 'COMPLETED';
 
-  const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm<FormData>({
+  const periodStart = period.start_date.slice(0, 10);
+  const periodEnd = period.end_date.slice(0, 10);
+
+  const today = new Date().toISOString().slice(0, 10);
+  // For create mode, default start_date to today (capped to period range)
+  const defaultStart = !sprint
+    ? (today >= periodStart && today <= periodEnd ? today : periodStart)
+    : (sprint.start_date ? sprint.start_date.slice(0, 10) : '');
+
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors, isDirty } } = useForm<FormData>({
     defaultValues: {
       name: sprint?.name || '',
       goal: sprint?.goal || '',
-      start_date: sprint?.start_date ? sprint.start_date.slice(0, 10) : '',
+      start_date: defaultStart,
       end_date: sprint?.end_date ? sprint.end_date.slice(0, 10) : '',
     },
   });
@@ -37,7 +46,7 @@ export function SprintPanel({ sprint, periodId, period, onClose }: Props) {
     reset({
       name: sprint?.name || '',
       goal: sprint?.goal || '',
-      start_date: sprint?.start_date ? sprint.start_date.slice(0, 10) : '',
+      start_date: defaultStart,
       end_date: sprint?.end_date ? sprint.end_date.slice(0, 10) : '',
     });
   }, [sprint, reset]);
@@ -58,6 +67,7 @@ export function SprintPanel({ sprint, periodId, period, onClose }: Props) {
     onSuccess: () => {
       toast.success(isEdit ? 'Sprint tersimpan' : 'Sprint dibuat');
       queryClient.invalidateQueries({ queryKey: ['sprints'] });
+      queryClient.invalidateQueries({ queryKey: ['sprint'] });
       onClose();
     },
     onError: (err: any) => {
@@ -65,8 +75,28 @@ export function SprintPanel({ sprint, periodId, period, onClose }: Props) {
     },
   });
 
-  const periodStart = period.start_date.slice(0, 10);
-  const periodEnd = period.end_date.slice(0, 10);
+  const startDate = watch('start_date');
+
+  // Apply a duration preset: add N days to start_date, capped at period end
+  const applyDuration = (days: number) => {
+    if (!startDate) {
+      toast.error('Pilih tanggal mulai terlebih dahulu');
+      return;
+    }
+    const start = new Date(startDate + 'T00:00:00');
+    const computed = new Date(start);
+    computed.setDate(computed.getDate() + days - 1); // inclusive end
+
+    const maxEnd = new Date(periodEnd + 'T00:00:00');
+    const finalEnd = computed > maxEnd ? maxEnd : computed;
+
+    const endStr = finalEnd.toISOString().slice(0, 10);
+    setValue('end_date', endStr, { shouldDirty: true });
+
+    if (computed > maxEnd) {
+      toast(`Tanggal selesai disesuaikan ke batas quarter (${formatDate(periodEnd)})`, { icon: 'ℹ️' });
+    }
+  };
 
   return (
     <div>
@@ -153,6 +183,27 @@ export function SprintPanel({ sprint, periodId, period, onClose }: Props) {
           </div>
         </div>
 
+        {/* Duration quick-select */}
+        {!isCompleted && (
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-gray-500 font-medium">Durasi:</span>
+            {[
+              { label: '1 minggu', days: 7 },
+              { label: '2 minggu', days: 14 },
+              { label: '3 minggu', days: 21 },
+            ].map(({ label, days }) => (
+              <button
+                key={days}
+                type="button"
+                onClick={() => applyDuration(days)}
+                className="px-2.5 py-1 text-[11px] font-medium text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-md transition-colors"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Period range hint */}
         <div className="px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-lg flex items-start gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#194FBC" strokeWidth="2" className="mt-0.5 flex-shrink-0">
@@ -229,5 +280,7 @@ function SprintStatusDot({ status }: { status: string }) {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  const d = new Date(dateStr.slice(0, 10) + 'T00:00:00');
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }

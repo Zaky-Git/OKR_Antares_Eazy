@@ -169,10 +169,6 @@ func (s *Service) Update(id uint, req UpdateRequest, userID uint) (*KeyResultRes
 		return nil, nil, nil, nil, ErrNotFound
 	}
 
-	if kr.CreatedBy != userID {
-		return nil, nil, nil, nil, ErrForbidden
-	}
-
 	// Determine next type
 	nextType := kr.EffectiveType()
 	if req.KRType != nil {
@@ -334,13 +330,9 @@ func (s *Service) Update(id uint, req UpdateRequest, userID uint) (*KeyResultRes
 }
 
 func (s *Service) Delete(id uint, userID uint) error {
-	kr, err := s.repo.FindByID(id)
+	_, err := s.repo.FindByID(id)
 	if err != nil {
 		return ErrNotFound
-	}
-
-	if kr.CreatedBy != userID {
-		return ErrForbidden
 	}
 
 	return s.repo.SoftDelete(id)
@@ -363,10 +355,6 @@ func (s *Service) ToggleMilestone(id uint, userID uint) (*KeyResultResponse, map
 
 	if kr.EffectiveType() != KRTypeMilestone {
 		return nil, nil, nil, ErrNotMilestone
-	}
-
-	if kr.CreatedBy != userID {
-		return nil, nil, nil, ErrForbidden
 	}
 
 	oldStatus := kr.Status

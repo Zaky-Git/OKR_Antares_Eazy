@@ -4,7 +4,7 @@ import { keyResultService } from '../services/keyResult.service';
 import { initiativeService } from '../services/initiative.service';
 import { periodService } from '../services/period.service';
 import { authService } from '../services/auth.service';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Objective, KeyResult, Initiative } from '../types';
 import { DetailPanel } from '../components/organisms/DetailPanel';
@@ -16,7 +16,6 @@ import { OwnerAvatar } from '../components/organisms/OwnerAvatar';
 import { FilterChips, FilterChipsState } from '../components/organisms/FilterChips';
 import { YearPicker } from '../components/atomics';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '../stores/useAuthStore';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -68,7 +67,18 @@ export function ObjectivesPage() {
     placeholderData: keepPreviousData,
   });
   const objectives = objRes?.data?.data || [];
-  const filteredObjectives = statusFilter === 'ALL' ? objectives : objectives.filter(o => o.status === statusFilter);
+
+  const [localSearch, setLocalSearch] = useState('');
+  const debouncedSearch = useDebounce(localSearch, 250);
+
+  const filteredObjectives = useMemo(() => {
+    let list = statusFilter === 'ALL' ? objectives : objectives.filter(o => o.status === statusFilter);
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
+      list = list.filter(o => o.title.toLowerCase().includes(q));
+    }
+    return list;
+  }, [objectives, statusFilter, debouncedSearch]);
 
   useEffect(() => {
     if (objectives.length > 0) setExpandedObj(new Set(objectives.map(o => o.id)));
@@ -255,8 +265,32 @@ export function ObjectivesPage() {
       </div>
 
       {/* Context filter chips: Strategy / Segment / Division */}
-      <div className="bg-white border border-gray-200 rounded-xl p-3 mb-5">
+      <div className="bg-white border border-gray-200 rounded-xl p-3 mb-3">
         <FilterChips value={contextFilter} onChange={setContextFilter} />
+      </div>
+
+      {/* Local search */}
+      <div className="relative mb-5">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+          <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+        </svg>
+        <input
+          type="text"
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
+          placeholder="Cari objective..."
+          className="w-full pl-9 pr-9 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 bg-white"
+        />
+        {localSearch && (
+          <button
+            onClick={() => setLocalSearch('')}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
 
 
@@ -282,7 +316,9 @@ export function ObjectivesPage() {
             <div className="space-y-8">
               {filteredObjectives.length === 0 ? (
                 <div className="text-center py-12 bg-white border border-dashed border-gray-200 rounded-2xl">
-                  <p className="text-sm text-gray-500">Tidak ada objective dengan status ini.</p>
+                  <p className="text-sm text-gray-500">
+                    {debouncedSearch ? `Tidak ada objective yang cocok dengan "${debouncedSearch}".` : 'Tidak ada objective dengan filter ini.'}
+                  </p>
                 </div>
               ) : filteredObjectives.map((obj, idx) => (
                 <SortableObjectiveCard key={obj.id} objective={obj} expanded={expandedObj.has(obj.id)}
@@ -321,6 +357,15 @@ export function ObjectivesPage() {
 function getPanelTitle(p: PanelState): string {
   const t: Record<string, string> = { 'objective-create': 'Buat Objective', 'objective-edit': 'Detail Objective', 'kr-create': 'Buat Key Result', 'kr-edit': 'Detail Key Result', 'initiative-create': 'Buat Initiative', 'initiative-edit': 'Detail Initiative' };
   return t[p.type] || '';
+}
+
+function useDebounce<T>(value: T, delay = 300): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
 }
 
 function getDaysLeft(date: string): { label: string; color: string } {
@@ -447,7 +492,6 @@ function KRCard({ kr, onClick, onAddInit, onAddChild, onClickInit, highlightedIn
   const [expanded, setExpanded] = useState(true);
   const isHighlighted = highlightedKRId === kr.id;
   const queryClient = useQueryClient();
-  const user = useAuthStore((s) => s.user);
   const isMilestone = (kr.kr_type || 'METRIC') === 'MILESTONE';
 
   const toggleMutation = useMutation({
@@ -484,10 +528,6 @@ function KRCard({ kr, onClick, onAddInit, onAddChild, onClickInit, highlightedIn
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user || user.id !== kr.created_by) {
-      toast.error('Anda tidak punya izin untuk mengubah milestone ini');
-      return;
-    }
     toggleMutation.mutate();
   };
 

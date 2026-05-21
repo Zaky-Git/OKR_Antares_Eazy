@@ -174,11 +174,6 @@ func (s *Service) Update(id uint, req UpdateRequest, userID uint) (*InitiativeRe
 		return nil, errors.New("initiative not found")
 	}
 
-
-	if initiative.CreatedBy != userID && (initiative.AssigneeID == nil || *initiative.AssigneeID != userID) {
-		return nil, errors.New("forbidden")
-	}
-
 	statusChanged := false
 	if req.Title != nil {
 		initiative.Title = *req.Title
@@ -266,12 +261,6 @@ func (s *Service) UpdateProgress(id uint, req ProgressUpdateRequest, userID uint
 	if err != nil {
 		return nil, errors.New("initiative not found")
 	}
-
-
-	if initiative.CreatedBy != userID && (initiative.AssigneeID == nil || *initiative.AssigneeID != userID) {
-		return nil, errors.New("forbidden")
-	}
-
 
 	hasChildren, _ := s.repo.HasChildren(id)
 	if hasChildren {
@@ -488,10 +477,7 @@ func (s *Service) UnassignFromSprint(initiativeID uint, userID uint) error {
 		return errors.New("initiative not found")
 	}
 
-	// Check ownership
-	if initiative.CreatedBy != userID && (initiative.AssigneeID == nil || *initiative.AssigneeID != userID) {
-		return errors.New("forbidden")
-	}
+	// Check ownership removed — all users can unassign
 
 	if initiative.SprintID == nil {
 		return errors.New("initiative is not assigned to any sprint")
@@ -506,10 +492,6 @@ func (s *Service) Delete(id uint, userID uint) error {
 	initiative, err := s.repo.FindByID(id)
 	if err != nil {
 		return errors.New("initiative not found")
-	}
-
-	if initiative.CreatedBy != userID && (initiative.AssigneeID == nil || *initiative.AssigneeID != userID) {
-		return errors.New("forbidden")
 	}
 
 	keyResultID := initiative.KeyResultID

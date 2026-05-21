@@ -102,9 +102,6 @@ export function DashboardPage() {
   // Count total KRs across all objectives (from objRes meta or objectives data)
   const totalObjectives = dashboard?.total_objectives || 0;
 
-  // Calculate in-progress initiatives count
-  const inProgressCount = myInitiatives.filter((i: Initiative) => i.status === 'IN_PROGRESS').length;
-
   // Sprint timeline calculation
   const getSprintTimelineInfo = () => {
     if (!activeSprint) return null;
@@ -243,14 +240,14 @@ export function DashboardPage() {
                 />
                 <SummaryCard
                   label="Key Results"
-                  value={dashboard.on_track + dashboard.at_risk + dashboard.off_track}
+                  value={dashboard.total_key_results}
                   desc={`Across ${totalObjectives} objectives`}
                   icon={<CheckCircle />}
                 />
                 <SummaryCard
                   label="Initiatives"
-                  value={myInitiatives.length}
-                  desc={`${inProgressCount} in progress · ${dashboard.overdue_initiatives} overdue`}
+                  value={dashboard.total_initiatives}
+                  desc={`${dashboard.in_progress} in progress · ${dashboard.overdue_initiatives} overdue`}
                   icon={<TrendUp />}
                 />
                 <SummaryCard

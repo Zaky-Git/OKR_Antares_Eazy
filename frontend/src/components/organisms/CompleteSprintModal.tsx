@@ -95,6 +95,7 @@ export default function CompleteSprintModal({ open, onClose, sprintId, sprintNam
 
       toast.success(`Sprint berhasil diselesaikan.${carryOverMsg}`);
       queryClient.invalidateQueries({ queryKey: ['sprints'] });
+      queryClient.invalidateQueries({ queryKey: ['sprint'] });
       queryClient.invalidateQueries({ queryKey: ['sprint-initiatives'] });
       queryClient.invalidateQueries({ queryKey: ['sprint-summary'] });
       queryClient.invalidateQueries({ queryKey: ['sprint-backlog'] });

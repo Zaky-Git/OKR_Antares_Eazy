@@ -35,6 +35,29 @@ func (s *Service) GetDashboard(periodID uint) (*DashboardResponse, error) {
 	var offTrack int64
 	s.db.Model(&objective.Objective{}).Where("period_id = ? AND status = ?", periodID, "OFF_TRACK").Count(&offTrack)
 
+	// Count total key results for this period
+	var totalKeyResults int64
+	s.db.Table("key_results").
+		Joins("JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = ?", periodID).
+		Where("key_results.deleted_at IS NULL").
+		Count(&totalKeyResults)
+
+	// Count total initiatives for this period
+	var totalInitiatives int64
+	s.db.Table("initiatives").
+		Joins("JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL").
+		Joins("JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = ?", periodID).
+		Where("initiatives.deleted_at IS NULL").
+		Count(&totalInitiatives)
+
+	// Count in-progress initiatives
+	var inProgress int64
+	s.db.Table("initiatives").
+		Joins("JOIN key_results ON key_results.id = initiatives.key_result_id AND key_results.deleted_at IS NULL").
+		Joins("JOIN objectives ON objectives.id = key_results.objective_id AND objectives.deleted_at IS NULL AND objectives.period_id = ?", periodID).
+		Where("initiatives.deleted_at IS NULL AND initiatives.status = ?", "IN_PROGRESS").
+		Count(&inProgress)
+
 	today := time.Now().UTC().Format("2006-01-02")
 	var overdueInitiatives int64
 	s.db.Model(&initiative.Initiative{}).
@@ -48,11 +71,14 @@ func (s *Service) GetDashboard(periodID uint) (*DashboardResponse, error) {
 
 	return &DashboardResponse{
 		TotalObjectives:    totalObjectives,
+		TotalKeyResults:    totalKeyResults,
+		TotalInitiatives:   totalInitiatives,
 		AvgProgress:        avgProgress,
 		OnTrack:            onTrack,
 		AtRisk:             atRisk,
 		OffTrack:           offTrack,
 		OverdueInitiatives: overdueInitiatives,
+		InProgress:         inProgress,
 		RecentUpdates:      recentUpdates,
 	}, nil
 }

@@ -116,11 +116,14 @@ export interface Notification {
 
 export interface DashboardSummary {
   total_objectives: number;
+  total_key_results: number;
+  total_initiatives: number;
   avg_progress: number;
   on_track: number;
   at_risk: number;
   off_track: number;
   overdue_initiatives: number;
+  in_progress: number;
   recent_updates: InitiativeUpdate[];
 }
 

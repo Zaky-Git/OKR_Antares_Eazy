@@ -4,11 +4,14 @@ import "github.com/antares-eazy/okr-backend/internal/modules/initiative"
 
 type DashboardResponse struct {
 	TotalObjectives    int64                        `json:"total_objectives"`
+	TotalKeyResults    int64                        `json:"total_key_results"`
+	TotalInitiatives   int64                        `json:"total_initiatives"`
 	AvgProgress        float64                      `json:"avg_progress"`
 	OnTrack            int64                        `json:"on_track"`
 	AtRisk             int64                        `json:"at_risk"`
 	OffTrack           int64                        `json:"off_track"`
 	OverdueInitiatives int64                        `json:"overdue_initiatives"`
+	InProgress         int64                        `json:"in_progress"`
 	RecentUpdates      []initiative.InitiativeUpdate `json:"recent_updates"`
 }
 

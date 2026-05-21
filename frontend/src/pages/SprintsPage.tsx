@@ -49,9 +49,10 @@ export function SprintsPage() {
     queryKey: ['sprints', activePeriodId],
     queryFn: () => sprintService.getByPeriod(activePeriodId!),
     enabled: !!activePeriodId,
+    staleTime: 0, // always refetch when navigating back
   });
 
-  const sprints: Sprint[] = sprintRes?.data?.data || [];
+  const sprints: Sprint[] = Array.isArray(sprintRes?.data?.data) ? sprintRes!.data.data : [];
 
   // Fetch summaries for all sprints
   const { data: summariesData } = useQuery({
@@ -86,8 +87,8 @@ export function SprintsPage() {
       const orderA = statusOrder[a.status] ?? 3;
       const orderB = statusOrder[b.status] ?? 3;
       if (orderA !== orderB) return orderA - orderB;
-      if (a.status === 'PLANNING') return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-      if (a.status === 'COMPLETED') return new Date(b.end_date).getTime() - new Date(a.end_date).getTime();
+      if (a.status === 'PLANNING') return new Date(a.start_date.slice(0, 10) + 'T00:00:00').getTime() - new Date(b.start_date.slice(0, 10) + 'T00:00:00').getTime();
+      if (a.status === 'COMPLETED') return new Date(b.end_date.slice(0, 10) + 'T00:00:00').getTime() - new Date(a.end_date.slice(0, 10) + 'T00:00:00').getTime();
       return 0;
     });
   }, [sprints, statusFilter]);
@@ -492,12 +493,15 @@ function SprintStatusBadge({ status }: { status: string }) {
   );
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr.slice(0, 10) + 'T00:00:00');
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function daysDuration(start: string, end: string): number {
-  const s = new Date(start).getTime();
-  const e = new Date(end).getTime();
+  const s = new Date(start.slice(0, 10) + 'T00:00:00').getTime();
+  const e = new Date(end.slice(0, 10) + 'T00:00:00').getTime();
   return Math.max(1, Math.round((e - s) / 86400000) + 1);
 }
