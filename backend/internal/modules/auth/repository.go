@@ -37,3 +37,7 @@ func (r *Repository) FindAll() ([]User, error) {
 	err := r.db.Order("name ASC").Find(&users).Error
 	return users, err
 }
+
+func (r *Repository) UpdateName(id uint, name string) error {
+	return r.db.Model(&User{}).Where("id = ?", id).Update("name", name).Error
+}

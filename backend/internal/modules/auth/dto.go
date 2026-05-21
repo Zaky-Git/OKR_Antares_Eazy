@@ -21,3 +21,7 @@ type LoginResponse struct {
 	Token string       `json:"token"`
 	User  UserResponse `json:"user"`
 }
+
+type UpdateProfileRequest struct {
+	Name string `json:"name" binding:"required,max=100"`
+}

@@ -101,6 +101,23 @@ func (s *Service) GetAllUsers() ([]UserResponse, error) {
 	return responses, nil
 }
 
+func (s *Service) UpdateProfile(userID uint, req UpdateProfileRequest) (*UserResponse, error) {
+	if err := s.repo.UpdateName(userID, req.Name); err != nil {
+		return nil, err
+	}
+
+	user, err := s.repo.FindByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
+}
+
 func (s *Service) generateToken(userID uint) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,

@@ -68,3 +68,21 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 
 	response.Success(c, http.StatusOK, "Success", users)
 }
+
+func (h *Handler) UpdateProfile(c *gin.Context) {
+	userID := c.GetUint("user_id")
+
+	var req UpdateProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return
+	}
+
+	user, err := h.service.UpdateProfile(userID, req)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "Failed to update profile", nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Profile updated successfully", user)
+}

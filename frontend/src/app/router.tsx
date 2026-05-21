@@ -8,6 +8,8 @@ import { SprintsPage } from '../pages/SprintsPage';
 import { SprintDetailPage } from '../pages/SprintDetailPage';
 import { LogsPage } from '../pages/LogsPage';
 import { MasterAdminPage } from '../pages/MasterAdminPage';
+import { ProfilePage } from '../pages/ProfilePage';
+import { NotificationsPage } from '../pages/NotificationsPage';
 import { AppLayout } from '../components/templates/AppLayout';
 import { AuthLayout } from '../components/templates/AuthLayout';
 import { ProtectedRoute } from '../guards/ProtectedRoute';
@@ -38,6 +40,8 @@ export const router = createBrowserRouter([
       { path: '/sprints/:id', element: <SprintDetailPage /> },
       { path: '/logs', element: <LogsPage /> },
       { path: '/admin/masters', element: <MasterAdminPage /> },
+      { path: '/profile', element: <ProfilePage /> },
+      { path: '/notifications', element: <NotificationsPage /> },
     ],
   },
 ]);
