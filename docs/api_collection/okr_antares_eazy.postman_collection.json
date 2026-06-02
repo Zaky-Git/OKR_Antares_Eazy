@@ -1,0 +1,1255 @@
+{
+  "info": {
+    "_postman_id": "3817bb6e-6d93-48a8-987a-6acee167458f",
+    "name": "OKR Antares Eazy",
+    "description": "",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string",
+      "disabled": false
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "disabled": false
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Zaky\",\n  \"email\": \"zaky@antares.id\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"zaky@antares.id\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Period",
+      "item": [
+        {
+          "name": "Ensure Current Year",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/periods/ensure-current-year",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "periods",
+                "ensure-current-year"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Periods",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/periods",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "periods"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Period",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/periods/current",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "periods",
+                "current"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sprint",
+      "item": [
+        {
+          "name": "Create Sprint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "sprints"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period_id\": 2,\n  \"name\": \"Sprint 1\",\n  \"goal\": \"Complete core OKR features\",\n  \"start_date\": \"2026-04-01\",\n  \"end_date\": \"2026-04-14\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sprints by Period",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints?period_id=2",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "sprints"
+              ],
+              "port": "",
+              "query": [
+                {
+                  "key": "period_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sprint by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "sprints",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Sprint",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "sprints",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sprint 1 - Updated\",\n  \"goal\": \"Updated goal\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate Sprint",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1/activate",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "sprints",
+                "1",
+                "activate"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Sprint",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1/complete",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "sprints",
+                "1",
+                "complete"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"review_note\": \"Completed auth module and period generation\",\n  \"retro_note\": \"Need better estimation for backend tasks\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Sprint",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sprints/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "sprints",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Objective",
+      "item": [
+        {
+          "name": "Create Objective",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "objectives"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period_id\": 2,\n  \"title\": \"Increase system reliability\",\n  \"description\": \"Reduce downtime and improve uptime to 99.9%\",\n  \"confidence_level\": 7\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Objectives by Period",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives?period_id=2&page=1&limit=10",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "objectives"
+              ],
+              "port": "",
+              "query": [
+                {
+                  "key": "period_id",
+                  "value": "2"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Objective by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "objectives",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Objective",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "objectives",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Increase system reliability\",\n  \"confidence_level\": 8,\n  \"status\": \"ON_TRACK\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Objective",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "objectives",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Key Result",
+      "item": [
+        {
+          "name": "Create Key Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/objectives/1/key-results",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "objectives",
+                "1",
+                "key-results"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Reduce bug count from 50 to 10\",\n  \"description\": \"Fix critical and major bugs\",\n  \"target_value\": 50,\n  \"current_value\": 0,\n  \"metric_unit\": \"bugs fixed\",\n  \"confidence_level\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Key Result",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "key-results",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Reduce bug count\",\n  \"current_value\": 15,\n  \"confidence_level\": 7\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Key Result",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "key-results",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Initiative",
+      "item": [
+        {
+          "name": "Create Initiative",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1/initiatives",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "key-results",
+                "1",
+                "initiatives"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fix authentication bugs\",\n  \"description\": \"Resolve all auth-related issues\",\n  \"assignee_id\": 1,\n  \"sprint_id\": 1,\n  \"due_date\": \"2026-04-10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Child Initiative",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/1/children",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "initiatives",
+                "1",
+                "children"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fix login token expiry bug\",\n  \"description\": \"Token expires too quickly\",\n  \"assignee_id\": 1,\n  \"sprint_id\": 1,\n  \"due_date\": \"2026-04-08\"\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Initiative Tree",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/key-results/1/initiative-tree",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "key-results",
+                "1",
+                "initiative-tree"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Initiative",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "initiatives",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Fix authentication bugs\",\n  \"status\": \"IN_PROGRESS\",\n  \"sprint_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Initiative Progress (leaf only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/2/progress",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "initiatives",
+                "2",
+                "progress"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"progress\": 50,\n  \"note\": \"Halfway done with token fix\",\n  \"blocker\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Initiative",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/initiatives/1",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "initiatives",
+                "1"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notification",
+      "item": [
+        {
+          "name": "Check Due Initiatives",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/check-due-initiatives",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "notifications",
+                "check-due-initiatives"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications?page=1&limit=10",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "notifications"
+              ],
+              "port": "",
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/unread-count",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "notifications",
+                "unread-count"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/1/read",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "notifications",
+                "1",
+                "read"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ],
+              "port": "",
+              "query": []
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard (by period)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard?period_id=2",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "dashboard"
+              ],
+              "port": "",
+              "query": [
+                {
+                  "key": "period_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Annual Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/annual?year=2026",
+              "protocol": "http",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "dashboard",
+                "annual"
+              ],
+              "port": "",
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            },
+            "body": {
+              "mode": "none"
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
